@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/signifyid-logo.svg" alt="Signify iD Logo" width="200" />
+  <img src="public/logo.svg" alt="Signify iD Logo" width="200" />
 </p>
 
 <h1 align="center">Signify iD</h1>
