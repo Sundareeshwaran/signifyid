@@ -39,9 +39,8 @@ build/
 # PRISMA
 # ==============================================================================
 
-# Keep schema tracked, ignore generated client in node_modules
-# Uncomment if using custom output path:
-# src/generated/prisma/
+# Generated Prisma client (regenerated at build time)
+src/generated/prisma/
 
 # Migration locks (auto-generated)
 prisma/migrations/**/migration_lock.toml
@@ -110,7 +109,6 @@ desktop.ini
 $RECYCLE.BIN/
 
 # Linux
-*~
 .directory
 
 # ==============================================================================
@@ -153,10 +151,19 @@ docker-compose.override.yml
 !env.template
 
 # ==============================================================================
-# FOR PRODUCTION DEPLOYMENT
+# FOR PRODUCTION DEPLOYMENT (Railway/Render)
 # ==============================================================================
-scripts
-migrations
-prisma
+# These are excluded for production deployment
+# The deployment platform should run migrations separately
+
+# Utility scripts (not needed in production)
+scripts/
+
+# SQL migration files (run separately on deployment)
+migrations/
+
+# Prisma directory (schema is baked into built code)
+prisma/
+
+# Prisma config file (only needed for CLI)
 prisma.config.ts
-@prisma/client
