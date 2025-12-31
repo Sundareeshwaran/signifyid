@@ -8,7 +8,7 @@
  * should use the raw pg pool in db.ts, as Accelerate's connection pooling
  * doesn't preserve PostgreSQL session variables across queries.
  */
-import { PrismaClient } from "../generated/prisma/index.js";
+import { PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
