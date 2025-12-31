@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "pnpm install && pnpm build",
   "builds": [
     {
       "src": "api/**/*.ts",
@@ -7,6 +8,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health.ts"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
