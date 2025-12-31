@@ -18,17 +18,10 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false, // Never expose source maps to client
   poweredByHeader: false, // Hide X-Powered-By header
 
-  // Exclude server directory from Next.js compilation
-  serverExternalPackages: ["prisma", "@prisma/client"],
-
-  // Webpack config to exclude server directory
-  webpack: (config) => {
-    // Exclude server directory from being processed
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: [...(config.watchOptions?.ignored || []), "**/server/**"],
-    };
-    return config;
+  // Turbopack configuration (Next.js 16 default bundler)
+  turbopack: {
+    // Set workspace root to this directory to avoid lockfile detection issues
+    root: __dirname,
   },
 
   // Security headers for SSR and static pages
