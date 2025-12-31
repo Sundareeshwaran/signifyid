@@ -1,0 +1,22 @@
+# Vercel Ignore File
+# These files/directories are excluded from Vercel deployment
+
+# Backend server (deployed separately)
+server/
+
+# Development files
+.agent/
+.vscode/
+
+# Environment files (set in Vercel dashboard)
+.env
+.env.local
+.env.*
+
+# Debug/test files
+*.log
+coverage/
+
+# Lock files (keep pnpm-lock.yaml for consistent builds)
+package-lock.json
+yarn.lock
