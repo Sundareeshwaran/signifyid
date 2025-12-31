@@ -157,3 +157,6 @@ docker-compose.override.yml
 # ==============================================================================
 scripts
 migrations
+prisma
+prisma.config.ts
+@prisma/client
