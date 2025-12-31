@@ -9,12 +9,29 @@
 </p>
 
 <p align="center">
+  <a href="https://signifyid.vercel.app">🌐 Live Demo</a> •
+  <a href="https://signifyid-api.vercel.app/api/health">🔌 API</a> •
+  <a href="https://www.npmjs.com/package/signifyid-client">📦 NPM</a> •
   <a href="#features">Features</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#project-structure">Structure</a> •
-  <a href="#deployment">Deployment</a>
+  <a href="#getting-started">Getting Started</a>
 </p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/signifyid-client"><img src="https://img.shields.io/npm/v/signifyid-client?color=blue&label=signifyid-client" alt="npm version"></a>
+  <a href="https://signifyid.vercel.app"><img src="https://img.shields.io/badge/demo-live-brightgreen" alt="Live Demo"></a>
+  <a href="https://github.com/Sundareeshwaran/signifyid"><img src="https://img.shields.io/github/license/Sundareeshwaran/signifyid" alt="License"></a>
+</p>
+
+---
+
+## 🔗 Production URLs
+
+| Service               | URL                                                     |
+| --------------------- | ------------------------------------------------------- |
+| **Frontend**          | https://signifyid.vercel.app                            |
+| **Backend API**       | https://signifyid-api.vercel.app                        |
+| **NPM Package**       | https://www.npmjs.com/package/signifyid-client          |
+| **Client SDK GitHub** | https://github.com/Sundareeshwaran/signifyid-client-npm |
 
 ---
 
