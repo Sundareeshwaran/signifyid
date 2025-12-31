@@ -151,19 +151,17 @@ docker-compose.override.yml
 !env.template
 
 # ==============================================================================
-# FOR PRODUCTION DEPLOYMENT (Railway/Render)
+# VERCEL DEPLOYMENT
 # ==============================================================================
-# These are excluded for production deployment
-# The deployment platform should run migrations separately
+# Files not needed in Vercel serverless deployment
 
-# Utility scripts (not needed in production)
+# Utility scripts (development only)
 scripts/
 
-# SQL migration files (run separately on deployment)
+# SQL migration files (run via CLI, not deployed)
 migrations/
 
-# Prisma directory (schema is baked into built code)
-prisma/
+# Vercel build output
+.vercel/
 
-# Prisma config file (only needed for CLI)
-prisma.config.ts
+.vercel
