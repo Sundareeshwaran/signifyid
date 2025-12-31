@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
 
   // Turbopack configuration (Next.js 16 default bundler)
   turbopack: {
-    // Set workspace root to this directory to avoid lockfile detection issues
-    root: __dirname,
+    // Set workspace root to current directory
+    root: process.cwd(),
   },
 
   // Security headers for SSR and static pages
