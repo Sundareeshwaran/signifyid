@@ -1,8 +1,14 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ==============================================================================
+# SIGNIFY iD - PROFESSIONAL GITIGNORE
+# ==============================================================================
+# Comprehensive .gitignore for Next.js + Express TypeScript monorepo
+# ==============================================================================
 
-# dependencies
-/node_modules
-/.pnp
+# ==============================================================================
+# DEPENDENCIES
+# ==============================================================================
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,32 +16,214 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# ==============================================================================
+# BUILD OUTPUTS
+# ==============================================================================
 
-# next.js
-/.next/
-/out/
+# Next.js
+.next/
+out/
 
-# production
-/build
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
-# misc
-.DS_Store
+# Server build
+server/dist/
+
+# General build
+build/
+dist/
+
+# ==============================================================================
+# ENVIRONMENT & SECRETS
+# ==============================================================================
+.env
+.env.*
+!.env.example
+!.env.template
 *.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
-# debug
+# ==============================================================================
+# IDE & EDITORS
+# ==============================================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ==============================================================================
+# OPERATING SYSTEM
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================================================
+# TESTING & COVERAGE
+# ==============================================================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+htmlcov/
+jest-results/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ==============================================================================
+# LOGS & DEBUG
+# ==============================================================================
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# ==============================================================================
+# CACHES
+# ==============================================================================
 
-# vercel
-.vercel
+# npm/pnpm/yarn
+.npm/
+.pnpm-store/
+.cache/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# ESLint
+.eslintcache
+
+# Prettier
+.prettiercache
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# Turbo
+.turbo/
+
+# Parcel
+.parcel-cache/
+
+# ==============================================================================
+# DATABASE
+# ==============================================================================
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# Prisma
+server/prisma/migrations/**/migration_lock.toml
+
+# ==============================================================================
+# DEPLOYMENT & HOSTING
+# ==============================================================================
+
+# Vercel
+.vercel/
+
+# Netlify
+.netlify/
+
+# AWS
+.aws-sam/
+.serverless/
+*.zip
+
+# Docker
+*.dockerfile.dev
+
+# ==============================================================================
+# MISCELLANEOUS
+# ==============================================================================
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Archives (if accidentally created)
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Lock files (keep one package manager)
+# Uncomment if only using pnpm:
+# package-lock.json
+# yarn.lock
+
+# Generated files
+*.generated.*
+
+# Storybook
+storybook-static/
+
+# ==============================================================================
+# PROJECT SPECIFIC
+# ==============================================================================
+
+# Agent/AI assistant configs
+.agent/
+
+# Local development scripts
+scripts/local/
+
+# Uploaded files (if storing locally)
+uploads/
+public/uploads/
+
+# ==============================================================================
+# EXCEPTIONS (Files to keep)
+# ==============================================================================
+!.gitkeep
+!.env.example
+!.env.template
+!env.template

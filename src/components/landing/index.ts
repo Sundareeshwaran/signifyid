@@ -1,0 +1,9 @@
+export { HeroSection } from "./hero-section";
+export { TrustStrip } from "./trust-strip";
+export { FeaturesSection } from "./features-section";
+export { HowItWorksSection } from "./how-it-works-section";
+export { SecuritySection } from "./security-section";
+export { DeveloperSection } from "./developer-section";
+export { TestimonialsSection } from "./testimonials-section";
+export { CTASection } from "./cta-section";
+export { LandingFooter } from "./landing-footer";
