@@ -1,6 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm build",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": null,
   "builds": [
     {
       "src": "api/**/*.ts",
@@ -11,6 +13,10 @@
     {
       "src": "/api/health",
       "dest": "/api/health.ts"
+    },
+    {
+      "src": "/api/cron/(.*)",
+      "dest": "/api/cron/$1.ts"
     },
     {
       "src": "/api/(.*)",
