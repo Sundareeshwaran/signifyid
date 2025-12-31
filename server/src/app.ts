@@ -144,7 +144,7 @@ app.get(
 );
 
 // 404 handler
-app.use("/api/{*splat}", (_req, res) => {
+app.use("/api/*", (_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
