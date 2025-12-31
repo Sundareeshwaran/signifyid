@@ -2,10 +2,10 @@
  * Email Retry Cron Job - Vercel Cron Handler
  *
  * Processes failed emails from the retry queue
- * Schedule: Every 5 minutes
+ * Schedule: Daily at 6 AM
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { processRetryQueue } from "../../src/mail/mail.service.js";
+import { processRetryQueue } from "../../src/mail/mail.service";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret (Vercel sets this automatically for cron calls)

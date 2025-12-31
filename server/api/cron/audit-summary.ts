@@ -5,7 +5,7 @@
  * Schedule: Sundays at 9 AM
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { runAuditSummaryJob } from "../../src/jobs/auditSummary.job.js";
+import { runAuditSummaryJob } from "../../src/jobs/auditSummary.job";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret (Vercel sets this automatically for cron calls)
