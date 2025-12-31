@@ -8,8 +8,8 @@ import { query } from "../config/db.js";
 import { config } from "../config/env.js";
 import { logger } from "../config/logger.js";
 
-// Cache for allowed origins
-let allowedOriginsCache: string[] = [];
+// Cache for allowed origins - pre-populate with frontendUrl for immediate availability
+let allowedOriginsCache: string[] = [config.frontendUrl];
 let lastCacheUpdate = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -38,7 +38,7 @@ async function loadAllowedOrigins(): Promise<string[]> {
           const url = new URL(row.origin);
           // Add full origin (protocol + hostname + port)
           origins.add(url.origin);
-        } catch (e) {
+        } catch {
           // Invalid URL, skip it
           logger.warn(`Invalid redirect URI found in database: ${row.origin}`);
         }
@@ -68,8 +68,8 @@ export async function getAllowedOrigins(): Promise<string[]> {
   allowedOriginsCache = await loadAllowedOrigins();
   lastCacheUpdate = now;
 
-  console.log(
-    `📋 Loaded ${allowedOriginsCache.length} CORS origins from database`
+  logger.info(
+    `Loaded ${allowedOriginsCache.length} CORS origins from database`
   );
   return allowedOriginsCache;
 }
@@ -97,12 +97,28 @@ export async function corsOriginChecker(
     return;
   }
 
-  const allowedOrigins = await getAllowedOrigins();
-
-  if (allowedOrigins.includes(origin)) {
+  // Always allow the frontend URL immediately (fallback for cold starts)
+  if (origin === config.frontendUrl) {
     callback(null, true);
-  } else {
-    logger.warn(`CORS request from unauthorized origin: ${origin}`);
-    callback(new Error("Not allowed by CORS"));
+    return;
+  }
+
+  try {
+    const allowedOrigins = await getAllowedOrigins();
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS request from unauthorized origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    }
+  } catch (error) {
+    // If database fails, still allow the frontend URL
+    logger.error("CORS check failed, allowing frontend URL only", { error });
+    if (origin === config.frontendUrl) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   }
 }
