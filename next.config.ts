@@ -19,10 +19,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false, // Hide X-Powered-By header
 
   // Turbopack configuration (Next.js 16 default bundler)
-  turbopack: {
-    // Set workspace root to current directory
-    root: process.cwd(),
-  },
+  // Empty config silences webpack migration warning
+  turbopack: {},
 
   // Security headers for SSR and static pages
   async headers() {
