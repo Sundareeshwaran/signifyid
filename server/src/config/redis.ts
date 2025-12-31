@@ -25,7 +25,7 @@ export async function initRedis(): Promise<void> {
     redis = createClient({
       url: config.redis.url,
       socket: {
-        reconnectStrategy: (retries) => {
+        reconnectStrategy: (retries: number) => {
           if (retries > 10) {
             console.error("❌ Redis: Max reconnection attempts reached");
             return new Error("Max reconnection attempts reached");
@@ -38,7 +38,7 @@ export async function initRedis(): Promise<void> {
     });
 
     // Event handlers
-    redis.on("error", (err) => {
+    redis.on("error", (err: Error) => {
       console.error("❌ Redis error:", err.message);
       isConnected = false;
     });

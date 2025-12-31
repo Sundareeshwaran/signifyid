@@ -123,12 +123,4 @@ export interface JwtPayload {
   exp?: number;
 }
 
-// Express Request with user
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
-  }
-}
+// NOTE: Express Request augmentation is in express.d.ts

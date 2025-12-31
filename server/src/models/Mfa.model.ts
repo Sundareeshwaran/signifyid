@@ -3,8 +3,10 @@
  *
  * Data access layer for MFA methods
  */
-import { authenticator } from "otplib";
+import * as otplib from "otplib";
 import { query } from "../config/db.js";
+
+const authenticator = otplib.authenticator;
 
 /**
  * Generate a new TOTP secret
