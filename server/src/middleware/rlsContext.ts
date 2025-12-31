@@ -6,6 +6,7 @@
  */
 import type { Request, Response, NextFunction } from "express";
 import { getClient } from "../config/db.js";
+import { logger } from "../config/logger.js";
 
 /**
  * Sets RLS context for the current database connection.
@@ -48,7 +49,7 @@ export async function rlsContextMiddleware(
     await setRLSContext(req.user.org_id, req.user.sub);
     next();
   } catch (error) {
-    console.error("Failed to set RLS context:", error);
+    logger.error("Failed to set RLS context", { error });
     res.status(500).json({ error: "Database context error" });
   }
 }

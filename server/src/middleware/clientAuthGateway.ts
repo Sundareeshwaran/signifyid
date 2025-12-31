@@ -14,6 +14,7 @@ import * as ClientSessionModel from "../models/ClientSession.model.js";
 import * as ClientModel from "../models/Client.model.js";
 import type { Client } from "../models/Client.model.js";
 import * as AuditLogModel from "../models/AuditLog.model.js";
+import { logger } from "../config/logger.js";
 
 /** Audit event types for client auth */
 export const CLIENT_AUTH_EVENTS = {
@@ -68,12 +69,12 @@ function getRequestMetadata(req: Request) {
 async function logAuditEvent(
   event: string,
   orgId: string | null,
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 ): Promise<void> {
   try {
     await AuditLogModel.create(orgId || "", null, event, metadata);
   } catch (error) {
-    console.error("[ClientAuthGateway] Failed to log audit event:", error);
+    logger.error("[ClientAuthGateway] Failed to log audit event", { error });
   }
 }
 
@@ -357,7 +358,7 @@ export function createClientAuthGateway(
 
     // 6. Success - attach session and client to request
     req.clientSession = session;
-    (req as any).client = client;
+    req.client = client;
 
     // Log successful access (optional, for high-security scenarios)
     // Uncomment if needed:
@@ -411,12 +412,12 @@ export async function optionalClientAuth(
             sessionDetails.client_id
           );
           if (client && client.is_active) {
-            (req as any).client = client;
+            req.client = client;
           }
         }
       }
     } catch (error) {
-      console.error("[ClientAuthGateway] Optional auth check failed:", error);
+      logger.error("[ClientAuthGateway] Optional auth check failed", { error });
     }
   }
 

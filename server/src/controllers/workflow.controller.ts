@@ -8,6 +8,7 @@ import type { Request, Response } from "express";
 import * as WorkflowModel from "../models/Workflow.model.js";
 import * as AuditLogModel from "../models/AuditLog.model.js";
 import * as WorkflowExecutor from "../services/workflow-executor.service.js";
+import { logger } from "../config/logger.js";
 
 /**
  * List all workflows in organization
@@ -36,7 +37,7 @@ export async function list(req: Request, res: Response) {
       })),
     });
   } catch (error) {
-    console.error("Error listing workflows:", error);
+    logger.error("Error listing workflows", { error });
     return res.status(500).json({ error: "Failed to list workflows" });
   }
 }
@@ -72,7 +73,7 @@ export async function getById(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error getting workflow:", error);
+    logger.error("Error getting workflow", { error });
     return res.status(500).json({ error: "Failed to get workflow" });
   }
 }
@@ -118,7 +119,7 @@ export async function create(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error creating workflow:", error);
+    logger.error("Error creating workflow", { error });
     return res.status(500).json({ error: "Failed to create workflow" });
   }
 }
@@ -189,7 +190,7 @@ export async function update(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error updating workflow:", error);
+    logger.error("Error updating workflow", { error });
     return res.status(500).json({ error: "Failed to update workflow" });
   }
 }
@@ -225,7 +226,7 @@ export async function remove(req: Request, res: Response) {
 
     return res.json({ message: "Workflow deleted" });
   } catch (error) {
-    console.error("Error deleting workflow:", error);
+    logger.error("Error deleting workflow", { error });
     return res.status(500).json({ error: "Failed to delete workflow" });
   }
 }
@@ -274,7 +275,7 @@ export async function publish(req: Request, res: Response) {
       },
     });
   } catch (error: unknown) {
-    console.error("Error publishing workflow:", error);
+    logger.error("Error publishing workflow", { error });
     const message =
       error instanceof Error ? error.message : "Failed to publish workflow";
     return res.status(400).json({ error: message });
@@ -324,7 +325,7 @@ export async function disable(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error disabling workflow:", error);
+    logger.error("Error disabling workflow", { error });
     return res.status(500).json({ error: "Failed to disable workflow" });
   }
 }
@@ -365,7 +366,7 @@ export async function duplicate(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error duplicating workflow:", error);
+    logger.error("Error duplicating workflow", { error });
     return res.status(500).json({ error: "Failed to duplicate workflow" });
   }
 }
@@ -395,7 +396,7 @@ export async function validate(req: Request, res: Response) {
       warnings: result.warnings,
     });
   } catch (error) {
-    console.error("Error validating workflow:", error);
+    logger.error("Error validating workflow", { error });
     return res.status(500).json({ error: "Failed to validate workflow" });
   }
 }
@@ -429,7 +430,7 @@ export async function preview(req: Request, res: Response) {
       executedNodes: steps.filter((s) => s.status === "completed").length,
     });
   } catch (error) {
-    console.error("Error previewing workflow:", error);
+    logger.error("Error previewing workflow", { error });
     return res.status(500).json({ error: "Failed to preview workflow" });
   }
 }
@@ -592,7 +593,7 @@ export async function execute(req: Request, res: Response) {
       steps: result.steps,
     });
   } catch (error) {
-    console.error("Error executing workflow:", error);
+    logger.error("Error executing workflow", { error });
     return res.status(500).json({ error: "Failed to execute workflow" });
   }
 }

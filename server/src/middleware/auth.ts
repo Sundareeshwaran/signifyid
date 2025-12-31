@@ -7,6 +7,7 @@ import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../services/token.service.js";
 import * as SessionModel from "../models/Session.model.js";
 import * as sessionCache from "../cache/session.cache.js";
+import { logger } from "../config/logger.js";
 
 /**
  * Require authentication - validates access token
@@ -58,7 +59,7 @@ export async function requireAuth(
 
   // Security: Ensure session belongs to the token user
   if (session.user_id !== payload.sub) {
-    console.error(
+    logger.error(
       `Session mismatch: token=${payload.sub}, session=${session.user_id}`
     );
     res.status(401).json({ error: "Session mismatch" });

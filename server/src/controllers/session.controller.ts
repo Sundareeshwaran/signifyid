@@ -9,6 +9,7 @@ import * as SessionModel from "../models/Session.model.js";
 import * as TokenModel from "../models/Token.model.js";
 import * as AuditLogModel from "../models/AuditLog.model.js";
 import { hasPermission } from "../services/permission.service.js";
+import { logger } from "../config/logger.js";
 
 /**
  * List sessions
@@ -22,7 +23,7 @@ export async function list(req: Request, res: Response) {
     const userPermissions = req.user!.permissions || [];
     const { page = "1", limit = "50" } = req.query;
 
-    console.log("Session List Request:", {
+    logger.debug("Session List Request", {
       userId,
       orgId,
       permissions: userPermissions,
@@ -49,14 +50,12 @@ export async function list(req: Request, res: Response) {
       });
     } else {
       // User view - own sessions only
-      console.log("Listing sessions for user:", userId);
+      logger.debug("Listing sessions for user:", { userId });
       const result = await SessionModel.listByUser(userId, orgId);
-      console.log(
-        "Found sessions count:",
-        result.sessions.length,
-        "total:",
-        result.total
-      );
+      logger.debug("Found sessions", {
+        count: result.sessions.length,
+        total: result.total,
+      });
 
       res.json({
         sessions: result.sessions.map(formatSession),
@@ -69,7 +68,7 @@ export async function list(req: Request, res: Response) {
       });
     }
   } catch (error) {
-    console.error("List sessions error:", error);
+    logger.error("List sessions error", { error });
     res.status(500).json({ error: "Failed to list sessions" });
   }
 }
@@ -124,7 +123,7 @@ export async function revoke(req: Request, res: Response) {
 
     res.json({ message: "Session revoked successfully" });
   } catch (error) {
-    console.error("Revoke session error:", error);
+    logger.error("Revoke session error", { error });
     res.status(500).json({ error: "Failed to revoke session" });
   }
 }
@@ -153,7 +152,7 @@ export async function logoutAll(req: Request, res: Response) {
       revokedCount,
     });
   } catch (error) {
-    console.error("Logout all error:", error);
+    logger.error("Logout all error", { error });
     res.status(500).json({ error: "Failed to logout all sessions" });
   }
 }
@@ -178,7 +177,7 @@ export async function getMySessionsOnly(req: Request, res: Response) {
 
     if (isSuperAdmin) {
       // Super admin view - all org sessions
-      console.log("Super admin viewing all org sessions");
+      logger.debug("Super admin viewing all org sessions");
       const result = await SessionModel.listByOrg(orgId, {
         page: pageNum,
         limit: limitNum,
@@ -195,17 +194,15 @@ export async function getMySessionsOnly(req: Request, res: Response) {
       });
     } else {
       // Regular user view - own sessions only
-      console.log("Getting my sessions for user:", userId);
+      logger.debug("Getting my sessions for user:", { userId });
       const result = await SessionModel.listByUser(userId, orgId, {
         page: pageNum,
         limit: limitNum,
       });
-      console.log(
-        "Found sessions count:",
-        result.sessions.length,
-        "total:",
-        result.total
-      );
+      logger.debug("Found sessions", {
+        count: result.sessions.length,
+        total: result.total,
+      });
 
       res.json({
         sessions: result.sessions.map(formatSession),
@@ -218,7 +215,7 @@ export async function getMySessionsOnly(req: Request, res: Response) {
       });
     }
   } catch (error) {
-    console.error("Get my sessions error:", error);
+    logger.error("Get my sessions error", { error });
     res.status(500).json({ error: "Failed to get sessions" });
   }
 }
@@ -239,7 +236,7 @@ export async function getCurrent(req: Request, res: Response) {
       authenticated: true,
     });
   } catch (error) {
-    console.error("Get current session error:", error);
+    logger.error("Get current session error", { error });
     res.status(500).json({ error: "Failed to get session info" });
   }
 }
@@ -253,8 +250,8 @@ function formatSession(
   return {
     id: session.id,
     userId: session.user_id,
-    userEmail: (session as any).user_email || undefined,
-    userName: (session as any).user_name || undefined,
+    userEmail: session.user_email,
+    userName: session.user_name,
     clientId: session.client_id,
     deviceInfo: session.device_info,
     ipAddress: session.ip_address,

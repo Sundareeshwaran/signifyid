@@ -6,6 +6,7 @@
  */
 import { createClient, RedisClientType } from "redis";
 import { config } from "./env.js";
+import { logger } from "./logger.js";
 
 let redis: RedisClientType | null = null;
 let isConnected = false;
@@ -17,7 +18,7 @@ let isConnected = false;
 export async function initRedis(): Promise<void> {
   // Skip if no Redis URL configured
   if (!config.redis.url) {
-    console.log("⚠️  Redis URL not configured, caching disabled");
+    logger.warn("Redis URL not configured, caching disabled");
     return;
   }
 
@@ -27,7 +28,7 @@ export async function initRedis(): Promise<void> {
       socket: {
         reconnectStrategy: (retries: number) => {
           if (retries > 10) {
-            console.error("❌ Redis: Max reconnection attempts reached");
+            logger.error("Redis: Max reconnection attempts reached");
             return new Error("Max reconnection attempts reached");
           }
           // Exponential backoff: 100ms, 200ms, 400ms, etc.
@@ -39,28 +40,28 @@ export async function initRedis(): Promise<void> {
 
     // Event handlers
     redis.on("error", (err: Error) => {
-      console.error("❌ Redis error:", err.message);
+      logger.error("Redis error", { message: err.message });
       isConnected = false;
     });
 
     redis.on("connect", () => {
-      console.log("✅ Redis connected");
+      logger.info("Redis connected");
       isConnected = true;
     });
 
     redis.on("reconnecting", () => {
-      console.log("🔄 Redis reconnecting...");
+      logger.info("Redis reconnecting...");
     });
 
     redis.on("end", () => {
-      console.log("⚠️  Redis connection closed");
+      logger.warn("Redis connection closed");
       isConnected = false;
     });
 
     // Connect to Redis
     await redis.connect();
   } catch (error) {
-    console.error("❌ Failed to connect to Redis:", error);
+    logger.error("Failed to connect to Redis", { error });
     redis = null;
     isConnected = false;
   }
@@ -96,14 +97,14 @@ export async function disconnectRedis(): Promise<void> {
   if (redis && isConnected) {
     try {
       await redis.quit();
-      console.log("✅ Redis disconnected gracefully");
+      logger.info("Redis disconnected gracefully");
     } catch (error) {
       // Only log if it's not a "client already closed" error
       if (
         !(error instanceof Error) ||
         !error.message.includes("client is closed")
       ) {
-        console.error("❌ Error disconnecting Redis:", error);
+        logger.error("Error disconnecting Redis", { error });
       }
     }
   }
@@ -125,7 +126,7 @@ export async function safeRedisOp<T>(
   try {
     return await operation();
   } catch (error) {
-    console.error("Redis operation failed:", error);
+    logger.error("Redis operation failed", { error });
     return null;
   }
 }

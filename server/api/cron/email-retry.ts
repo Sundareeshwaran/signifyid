@@ -6,19 +6,20 @@
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { processRetryQueue } from "../../src/mail/mail.service";
+import { logger } from "../../src/config/logger";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret (Vercel sets this automatically for cron calls)
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    console.error("Unauthorized cron request");
+    logger.error("Unauthorized cron request");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    console.log("🔄 Running email retry cron job...");
+    logger.info("Running email retry cron job...");
     const processed = await processRetryQueue();
-    console.log(`✅ Email retry: processed ${processed} emails`);
+    logger.info(`Email retry: processed ${processed} emails`);
 
     return res.status(200).json({
       success: true,
@@ -26,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("❌ Email retry cron failed:", error);
+    logger.error("Email retry cron failed", { error });
     return res.status(500).json({
       error: "Cron job failed",
       message: error instanceof Error ? error.message : "Unknown error",

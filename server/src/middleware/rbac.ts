@@ -11,6 +11,7 @@ import {
 } from "../services/permission.service.js";
 import * as AuditLogModel from "../models/AuditLog.model.js";
 import { config } from "../config/env.js";
+import { logger } from "../config/logger.js";
 
 /**
  * Require specific permission(s) - user must have AT LEAST ONE
@@ -47,7 +48,7 @@ export function requirePermission(...permissions: string[]) {
           }
         );
       } catch (err) {
-        console.error("Failed to log access denial:", err);
+        logger.error("Failed to log access denial", { error: err });
       }
 
       // Production: generic error, Development: include required permissions for debugging
@@ -99,7 +100,7 @@ export function requireAllPermissions(...permissions: string[]) {
           }
         );
       } catch (err) {
-        console.error("Failed to log access denial:", err);
+        logger.error("Failed to log access denial", { error: err });
       }
 
       // Production: generic error, Development: include required permissions for debugging

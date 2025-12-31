@@ -8,6 +8,7 @@ import cron, { type ScheduledTask } from "node-cron";
 import { query } from "../config/db.js";
 import { config } from "../config/env.js";
 import { sendAuditSummary } from "../mail/mail.service.js";
+import { logger } from "../config/logger.js";
 
 /**
  * Security-relevant action prefixes to include in summary
@@ -172,8 +173,8 @@ async function processAllOrganizations(): Promise<{
   const endDate = new Date();
   const startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
 
-  console.log(
-    `📊 Processing audit summaries for ${startDate.toISOString()} to ${endDate.toISOString()}`
+  logger.info(
+    `Processing audit summaries for ${startDate.toISOString()} to ${endDate.toISOString()}`
   );
 
   // Get all active organizations
@@ -198,7 +199,7 @@ async function processAllOrganizations(): Promise<{
       const recipients = await getAdminRecipients(row.org_id);
 
       if (!recipients.length) {
-        console.log(`⚠️ No admin recipients for org ${row.org_id}`);
+        logger.warn(`No admin recipients for org ${row.org_id}`);
         continue;
       }
 
@@ -232,16 +233,15 @@ async function processAllOrganizations(): Promise<{
           );
           emailsSent++;
         } catch (emailError) {
-          console.error(
-            `Failed to send audit summary to ${recipient.email}:`,
-            emailError
-          );
+          logger.error(`Failed to send audit summary to ${recipient.email}`, {
+            error: emailError,
+          });
         }
       }
 
       processed++;
     } catch (error) {
-      console.error(`Error processing org ${row.org_id}:`, error);
+      logger.error(`Error processing org ${row.org_id}`, { error });
     }
   }
 
@@ -252,18 +252,18 @@ async function processAllOrganizations(): Promise<{
  * Run the audit summary job manually
  */
 export async function runAuditSummaryJob(): Promise<void> {
-  console.log("🔄 Starting weekly audit summary job...");
+  logger.info("Starting weekly audit summary job...");
   const startTime = Date.now();
 
   try {
     const { processed, emailsSent } = await processAllOrganizations();
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
-    console.log(
-      `✅ Audit summary job completed: ${processed} orgs processed, ${emailsSent} emails sent (${duration}s)`
+    logger.info(
+      `Audit summary job completed: ${processed} orgs processed, ${emailsSent} emails sent (${duration}s)`
     );
   } catch (error) {
-    console.error("❌ Audit summary job failed:", error);
+    logger.error("Audit summary job failed", { error });
   }
 }
 
@@ -274,7 +274,7 @@ export async function runAuditSummaryJob(): Promise<void> {
 export function scheduleAuditSummaryJob(
   cronExpression: string = "0 9 * * 0"
 ): ScheduledTask {
-  console.log(`📅 Scheduling audit summary job: ${cronExpression}`);
+  logger.info(`Scheduling audit summary job: ${cronExpression}`);
 
   const task = cron.schedule(cronExpression, () => {
     runAuditSummaryJob();

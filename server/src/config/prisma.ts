@@ -12,6 +12,7 @@ import { PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
+import { logger } from "./logger.js";
 
 // Check if using Accelerate (prisma:// URL)
 const isAccelerateEnabled = process.env.DATABASE_URL?.startsWith("prisma://");
@@ -97,10 +98,10 @@ export function getRLSContext(
 
 // Log Prisma/Accelerate status on startup
 if (isAccelerateEnabled) {
-  console.log("✅ Prisma Accelerate enabled (connection pooling + caching)");
+  logger.info("Prisma Accelerate enabled (connection pooling + caching)");
 } else {
-  console.log(
-    "⚠️  Using direct database connection (set DATABASE_URL to prisma:// for Accelerate)"
+  logger.info(
+    "Using direct database connection (set DATABASE_URL to prisma:// for Accelerate)"
   );
 }
 
