@@ -6,9 +6,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, ArrowLeft, Loader2, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 /**
  * MFA Challenge Content
@@ -20,7 +26,7 @@ function MFAContent() {
   const [error, setError] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   // Get userId from URL params (set by login page)
   const userId = searchParams.get("userId");
 
@@ -81,7 +87,7 @@ function MFAContent() {
 
   const handleSubmit = async (fullCode?: string) => {
     const codeToVerify = fullCode || code.join("");
-    
+
     if (!/^\d{6}$/.test(codeToVerify)) {
       setError("Please enter a valid 6-digit code");
       return;
@@ -96,17 +102,17 @@ function MFAContent() {
     setError("");
 
     try {
-      const response = await fetch(`${API_URL}/api/mfa/challenge`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const response = await fetch(`${API_URL}/mfa/challenge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ userId, code: codeToVerify }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Verification failed');
+        setError(data.error || "Verification failed");
         setIsLoading(false);
         // Clear code on error
         setCode(["", "", "", "", "", ""]);
@@ -149,10 +155,10 @@ function MFAContent() {
                 <Shield className="h-6 w-6 text-primary-foreground" />
               </div>
             </div>
-            <CardTitle className="text-2xl">Two-Factor Authentication</CardTitle>
-            <CardDescription>
-              Verify your identity to continue
-            </CardDescription>
+            <CardTitle className="text-2xl">
+              Two-Factor Authentication
+            </CardTitle>
+            <CardDescription>Verify your identity to continue</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Error Message */}
@@ -172,7 +178,9 @@ function MFAContent() {
               {code.map((digit, index) => (
                 <Input
                   key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
@@ -217,7 +225,7 @@ function MFAContent() {
 
 /**
  * MFA Challenge Page
- * 
+ *
  * Second step of authentication - TOTP code verification
  */
 export default function MFAPage() {

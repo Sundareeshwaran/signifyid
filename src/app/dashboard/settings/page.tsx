@@ -158,7 +158,7 @@ function SettingsContent() {
   const loadMfaStatus = async () => {
     setMfaLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/mfa/status`, {
+      const response = await fetch(`${API_URL}/mfa/status`, {
         credentials: "include",
       });
       const data = await response.json();
@@ -199,7 +199,7 @@ function SettingsContent() {
     setMfaError("");
 
     try {
-      const response = await fetch(`${API_URL}/api/mfa/enroll`, {
+      const response = await fetch(`${API_URL}/mfa/enroll`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -230,7 +230,7 @@ function SettingsContent() {
     setMfaError("");
 
     try {
-      const response = await fetch(`${API_URL}/api/mfa/verify`, {
+      const response = await fetch(`${API_URL}/mfa/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -264,7 +264,7 @@ function SettingsContent() {
     setMfaError("");
 
     try {
-      const response = await fetch(`${API_URL}/api/mfa/disable`, {
+      const response = await fetch(`${API_URL}/mfa/disable`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
