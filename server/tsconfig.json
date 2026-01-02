@@ -10,8 +10,11 @@
     "declaration": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node", "express", "express-serve-static-core"]
   },
   "include": ["src/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist"]
 }
+
