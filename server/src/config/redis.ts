@@ -43,9 +43,6 @@ export async function initRedis(): Promise<void> {
 
   initPromise = (async () => {
     try {
-      // Determine if TLS is required (rediss:// protocol)
-      const useTls = config.redis.url.startsWith("rediss://");
-
       redis = createClient({
         url: config.redis.url,
         socket: {
@@ -58,12 +55,6 @@ export async function initRedis(): Promise<void> {
             return Math.min(retries * 100, 3000);
           },
           connectTimeout: 5000,
-          // TLS configuration for Redis Cloud and other hosted Redis services
-          ...(useTls && {
-            tls: true,
-            // Allow self-signed certificates (required for some Redis Cloud setups)
-            rejectUnauthorized: false,
-          }),
         },
       });
 
