@@ -72,6 +72,43 @@ app.use(
   })
 );
 
+// Handle preflight OPTIONS requests explicitly for Vercel serverless
+app.options("*", async (req, res) => {
+  const origin = req.headers.origin;
+
+  // No origin header = same-origin or non-browser request
+  if (!origin) {
+    res.header("Access-Control-Allow-Origin", config.frontendUrl);
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Max-Age", "86400");
+    return res.sendStatus(204);
+  }
+
+  // Check if origin is allowed using the cors service
+  const { getAllowedOrigins } = await import("./services/cors.service.js");
+  const allowedOrigins = await getAllowedOrigins();
+
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Max-Age", "86400");
+    return res.sendStatus(204);
+  }
+
+  // Origin not allowed
+  return res.sendStatus(403);
+});
+
 // CORS - Dynamic origins from database
 app.use(
   cors({
