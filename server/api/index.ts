@@ -4,7 +4,7 @@
  * Exports the Express app for Vercel Functions with CORS handling
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import app from "../src/app";
+import app from "../src/app.js";
 
 // Handle Vercel requests with explicit CORS for preflight
 export default function handler(req: VercelRequest, res: VercelResponse) {

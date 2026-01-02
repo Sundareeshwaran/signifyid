@@ -5,8 +5,8 @@
  * Schedule: Daily at 6 AM
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { processRetryQueue } from "../../src/mail/mail.service";
-import { logger } from "../../src/config/logger";
+import { processRetryQueue } from "../../src/mail/mail.service.js";
+import { logger } from "../../src/config/logger.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Verify cron secret (Vercel sets this automatically for cron calls)
