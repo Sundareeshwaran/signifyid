@@ -2,7 +2,7 @@
 # These files/directories are excluded from Vercel deployment
 
 # Backend server (deployed separately)
-server/
+# server/
 
 # Development files
 .agent/
