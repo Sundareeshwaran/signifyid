@@ -25,8 +25,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
   // Handle preflight OPTIONS request
   if (req.method === "OPTIONS") {
-    res.status(204).end();
-    return;
+    return res.status(204).send("");
   }
 
   // Pass to Express app

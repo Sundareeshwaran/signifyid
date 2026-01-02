@@ -35,9 +35,16 @@
   ],
   "rewrites": [
     { "source": "/api/health", "destination": "/api/health.ts" },
-    { "source": "/api/cron/:path*", "destination": "/api/cron/:path*.ts" },
-    { "source": "/api/:path*", "destination": "/api/index.ts" },
-    { "source": "/.well-known/:path*", "destination": "/api/index.ts" }
+    {
+      "source": "/api/cron/email-retry",
+      "destination": "/api/cron/email-retry.ts"
+    },
+    {
+      "source": "/api/cron/audit-summary",
+      "destination": "/api/cron/audit-summary.ts"
+    },
+    { "source": "/api/:path(.*)", "destination": "/api/index.ts" },
+    { "source": "/.well-known/:path(.*)", "destination": "/api/index.ts" }
   ],
   "crons": [
     {
