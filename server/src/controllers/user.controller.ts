@@ -275,6 +275,9 @@ export async function invite(req: Request, res: Response) {
     res.status(201).json({
       message: "User invited successfully. Invitation email has been sent.",
       user: userView.formatCreatedUser(user),
+      inviteToken: inviteToken.token,
+      inviteUrl: inviteUrl,
+      expiresAt: inviteToken.expires_at,
     });
   } catch (error) {
     await client.query("ROLLBACK");
