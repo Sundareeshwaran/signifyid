@@ -43,6 +43,10 @@
       "source": "/api/cron/audit-summary",
       "destination": "/api/cron/audit-summary.ts"
     },
+    {
+      "source": "/api/internal/redis-health",
+      "destination": "/api/internal/redis-health.ts"
+    },
     { "source": "/api/:path(.*)", "destination": "/api/index.ts" },
     { "source": "/.well-known/:path(.*)", "destination": "/api/index.ts" }
   ],
