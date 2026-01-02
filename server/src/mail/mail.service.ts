@@ -137,7 +137,7 @@ export async function sendEmail(
         ...data,
         year: new Date().getFullYear(),
         frontendUrl: config.frontendUrl,
-        logoUrl: `${config.frontendUrl}/logo.svg`,
+        logoUrl: `${config.frontendUrl}/logo.png`,
       });
     } catch (templateError) {
       logger.error(`Template render error for ${template}`, {
