@@ -117,7 +117,7 @@ export default function LogsPage() {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/logs?page=${page}&limit=${limit}`,
+        `${API_URL}/logs?page=${page}&limit=${limit}`,
         {
           credentials: "include",
         }
