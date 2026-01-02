@@ -9,23 +9,35 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/health",
-      "dest": "/api/health.ts"
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://signifyid.vercel.app"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        }
+      ]
     },
     {
-      "src": "/api/cron/(.*)",
-      "dest": "/api/cron/$1.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/.well-known/(.*)",
-      "dest": "/api/index.ts"
+      "source": "/.well-known/(.*)",
+      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
     }
+  ],
+  "rewrites": [
+    { "source": "/api/health", "destination": "/api/health.ts" },
+    { "source": "/api/cron/:path*", "destination": "/api/cron/:path*.ts" },
+    { "source": "/api/:path*", "destination": "/api/index.ts" },
+    { "source": "/.well-known/:path*", "destination": "/api/index.ts" }
   ],
   "crons": [
     {
