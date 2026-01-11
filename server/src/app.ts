@@ -123,9 +123,27 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 // Cookie parsing
 app.use(cookieParser());
 
-// Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+// Health check (includes Redis and database verification)
+app.get("/api/health", async (_req, res) => {
+  const { checkRedisHealth } = await import("./config/redis.js");
+
+  // Check Redis
+  const redisHealth = await checkRedisHealth();
+
+  const isHealthy = redisHealth.connected;
+
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? "ok" : "degraded",
+    timestamp: new Date().toISOString(),
+    environment: config.nodeEnv,
+    services: {
+      redis: {
+        connected: redisHealth.connected,
+        latencyMs: redisHealth.latencyMs,
+        error: redisHealth.error,
+      },
+    },
+  });
 });
 
 // API Routes
