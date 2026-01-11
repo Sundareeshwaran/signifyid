@@ -59,12 +59,9 @@ export async function initRedis(): Promise<void> {
           },
           connectTimeout: 5000,
           // TLS configuration for Redis Cloud and other hosted Redis services
-          ...(useTls && {
-            tls: true,
-            // Allow self-signed certificates (required for some Redis Cloud setups)
-            rejectUnauthorized: false,
-          }),
-        },
+          ...(useTls ? { tls: { rejectUnauthorized: false } } : {}),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
       });
 
       // Event handlers
