@@ -272,7 +272,8 @@ Ensure all production environment variables are set:
 
 ## 📄 License
 
-This project is proprietary software. All rights reserved.
+This project is proprietary software owned by SignifyID.
+Unauthorized use or distribution is prohibited.
 
 ---
 
