@@ -12,6 +12,7 @@ import {
   initRedis,
   disconnectRedis,
   isRedisConnected,
+  checkRedisHealth,
 } from "./config/redis.js";
 // Initialize Prisma (for status logs and Optimize setup)
 import "./config/prisma.js";
@@ -27,13 +28,16 @@ async function start() {
     await pool.query("SELECT NOW()");
     logger.info("Database connected");
 
-    // Initialize Redis
+    // Initialize Redis and verify connectivity
     await initRedis();
-    logger.info(
-      `Redis: ${
-        isRedisConnected() ? "connected" : "not configured or unavailable"
-      }`
-    );
+    const redisHealth = await checkRedisHealth();
+    if (redisHealth.connected) {
+      logger.info(`Redis connected (latency: ${redisHealth.latencyMs}ms)`);
+    } else {
+      logger.warn(
+        `Redis unavailable: ${redisHealth.error || "not configured"}`
+      );
+    }
 
     // Start background jobs (email retry, audit summary)
     await startJobs();
