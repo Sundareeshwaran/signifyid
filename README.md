@@ -182,5 +182,5 @@ Unauthorized use or distribution is prohibited.
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Signify iD Team</strong>
+  Built with ❤️ by <strong>Sundareeshwaran</strong>
 </p>
