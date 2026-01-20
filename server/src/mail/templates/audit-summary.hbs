@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Security Summary</title>
+  <style>
+    /* Reset & Base */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #e5e5e5;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    .email-wrapper {
+      background-color: #262626;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      border: 1px solid #404040;
+    }
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header .subtitle {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      margin: 0;
+    }
+    /* Content */
+    .content {
+      padding: 32px 24px;
+    }
+    .greeting {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #f5f5f5;
+    }
+    .message {
+      margin-bottom: 24px;
+      color: #a3a3a3;
+      font-size: 16px;
+    }
+    .message strong {
+      color: #d97706;
+    }
+    /* Date Range */
+    .date-range {
+      background-color: #1f1f1f;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #a3a3a3;
+      border: 1px solid #333333;
+    }
+    .date-range strong {
+      color: #d97706;
+    }
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .stat-card {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+      border: 1px solid #333333;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #d97706;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #737373;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-card.alert {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .stat-card.alert .stat-value {
+      color: #ef4444;
+    }
+    /* Events Table */
+    .events-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .events-table th {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: #ffffff;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .events-table th:first-child {
+      border-radius: 8px 0 0 0;
+    }
+    .events-table th:last-child {
+      border-radius: 0 8px 0 0;
+    }
+    .events-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #333333;
+      font-size: 14px;
+      background-color: #1f1f1f;
+    }
+    .events-table tr:last-child td {
+      border-bottom: none;
+    }
+    .events-table tr:last-child td:first-child {
+      border-radius: 0 0 0 8px;
+    }
+    .events-table tr:last-child td:last-child {
+      border-radius: 0 0 8px 0;
+    }
+    .events-table .action-name {
+      font-weight: 600;
+      color: #f5f5f5;
+    }
+    .events-table .count {
+      text-align: center;
+      font-weight: 700;
+      color: #d97706;
+    }
+    .events-table .date {
+      color: #737373;
+      font-size: 12px;
+    }
+    /* No Events */
+    .no-events {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      color: #737373;
+      border: 1px solid #333333;
+    }
+    .no-events .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .no-events p {
+      margin: 0;
+      font-size: 15px;
+    }
+    /* CTA Button */
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 16px 0;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    }
+    .buttons-row {
+      text-align: center;
+      margin: 24px 0;
+    }
+    /* Security Tip */
+    .security-tip {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border-left: 4px solid #3b82f6;
+      border-radius: 0 12px 12px 0;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .security-tip h4 {
+      margin: 0 0 10px 0;
+      color: #60a5fa;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .security-tip p {
+      margin: 0;
+      color: #93c5fd;
+      font-size: 14px;
+    }
+    /* Section Title */
+    .section-title {
+      color: #f5f5f5;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+    }
+    /* Footer */
+    .footer {
+      background-color: #1f1f1f;
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: #737373;
+      border-top: 1px solid #333333;
+    }
+    .footer a {
+      color: #d97706;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #404040;
+      margin: 24px 0;
+    }
+    /* Helper Text */
+    .helper-text {
+      font-size: 14px;
+      color: #737373;
+      text-align: center;
+    }
+    .helper-text a {
+      color: #d97706;
+      text-decoration: none;
+    }
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+      .content {
+        padding: 24px 16px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .events-table {
+        font-size: 12px;
+      }
+      .events-table th, .events-table td {
+        padding: 10px 8px;
+      }
+      .header h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="email-wrapper">
+      <!-- Header -->
+      <div class="header">
+        <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+        <h1>📊 Weekly Security Summary</h1>
+        <p class="subtitle">{{organizationName}}</p>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <p class="greeting">Hello {{recipientName}},</p>
+        
+        <p class="message">
+          Here's your weekly security summary for <strong>{{organizationName}}</strong>. 
+          This report highlights key security events and activity from the past week.
+        </p>
+
+        <div class="date-range">
+          📅 <strong>{{dateRange.start}}</strong> – <strong>{{dateRange.end}}</strong>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">{{totalEvents}}</div>
+            <div class="stat-label">Total Events</div>
+          </div>
+          <div class="stat-card {{#if securityAlerts}}alert{{/if}}">
+            <div class="stat-value">{{securityAlerts}}</div>
+            <div class="stat-label">Security Alerts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{topEvents.length}}</div>
+            <div class="stat-label">Event Types</div>
+          </div>
+        </div>
+
+        <!-- Top Events Table -->
+        {{#if topEvents.length}}
+        <h3 class="section-title">Top Security Events</h3>
+        <table class="events-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th style="text-align: center;">Count</th>
+              <th>Last Occurred</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each topEvents}}
+            <tr>
+              <td class="action-name">{{this.action}}</td>
+              <td class="count">{{this.count}}</td>
+              <td class="date">{{this.lastOccurred}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{else}}
+        <div class="no-events">
+          <div class="icon">✨</div>
+          <p>No significant security events this week!</p>
+        </div>
+        {{/if}}
+
+        <div class="buttons-row">
+          <a href="{{dashboardLink}}" class="cta-button">View Full Audit Logs</a>
+        </div>
+
+        {{#if securityAlerts}}
+        <div class="security-tip">
+          <h4>🔔 Security Recommendations</h4>
+          <p>
+            You had {{securityAlerts}} security alert(s) this week. We recommend reviewing 
+            these events in detail and ensuring all security policies are up to date.
+          </p>
+        </div>
+        {{/if}}
+
+        <hr class="divider">
+
+        <p class="helper-text">
+          This email is sent automatically to security administrators.<br>
+          To adjust notification preferences, visit your 
+          <a href="{{frontendUrl}}/dashboard/settings">account settings</a>.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>© {{year}} Signify iD. All rights reserved.</p>
+        <p>
+          <a href="{{frontendUrl}}">Visit Signify iD</a> | 
+          <a href="{{dashboardLink}}">View Audit Logs</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

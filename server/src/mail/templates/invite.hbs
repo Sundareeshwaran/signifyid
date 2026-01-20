@@ -1,0 +1,122 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You've Been Invited</title>
+    <style>
+      /* Reset & Base */ body { margin: 0; padding: 0; font-family: 'Segoe UI',
+      Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a1a;
+      color: #e5e5e5; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+      .container { max-width: 600px; margin: 0 auto; padding: 24px 16px; }
+      .email-wrapper { background-color: #262626; border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); overflow: hidden; border: 1px
+      solid #404040; } /* Header */ .header { background:
+      linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%); padding:
+      32px 24px; text-align: center; } .logo { width: 56px; height: 56px;
+      margin-bottom: 16px; } .header h1 { color: #ffffff; margin: 0; font-size:
+      24px; font-weight: 700; letter-spacing: -0.02em; } .header .tagline {
+      color: rgba(255, 255, 255, 0.85); font-size: 14px; margin-top: 8px; } /*
+      Content */ .content { padding: 32px 24px; } .greeting { font-size: 20px;
+      font-weight: 600; margin-bottom: 16px; color: #f5f5f5; } .message {
+      margin-bottom: 24px; color: #a3a3a3; font-size: 16px; } .message strong {
+      color: #d97706; } /* Invite Details Card */ .invite-details { background:
+      linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.05)
+      100%); border: 1px solid rgba(217, 119, 6, 0.3); border-radius: 12px;
+      padding: 20px; margin: 24px 0; } .invite-details p { margin: 10px 0;
+      color: #d4d4d4; font-size: 15px; } .invite-details strong { color:
+      #d97706; font-weight: 600; } /* CTA Button */ .cta-button { display:
+      inline-block; background: linear-gradient(135deg, #d97706 0%, #b45309
+      100%); color: #ffffff !important; text-decoration: none; padding: 16px
+      40px; border-radius: 10px; font-weight: 600; font-size: 16px; margin: 24px
+      0; text-align: center; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+      transition: all 0.2s ease; } .cta-button:hover { box-shadow: 0 6px 20px
+      rgba(217, 119, 6, 0.45); } /* Expiry Notice */ .expiry-notice {
+      background-color: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179,
+      8, 0.3); border-radius: 10px; padding: 16px 20px; margin: 24px 0;
+      font-size: 14px; color: #eab308; } .expiry-notice strong { color: #facc15;
+      } /* Footer */ .footer { background-color: #1f1f1f; padding: 24px;
+      text-align: center; font-size: 13px; color: #737373; border-top: 1px solid
+      #333333; } .footer a { color: #d97706; text-decoration: none; } .footer
+      a:hover { text-decoration: underline; } /* Divider */ .divider { border:
+      none; border-top: 1px solid #404040; margin: 24px 0; } /* Helper Text */
+      .helper-text { font-size: 14px; color: #737373; margin-top: 24px; }
+      .helper-text a { color: #d97706; text-decoration: none; } .link-fallback {
+      font-size: 12px; color: #525252; margin-top: 24px; word-break: break-all;
+      } .link-fallback span { color: #d97706; } /* Responsive */ @media only
+      screen and (max-width: 600px) { .container { padding: 12px; } .content {
+      padding: 24px 16px; } .cta-button { display: block; text-align: center; }
+      .header h1 { font-size: 20px; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="email-wrapper">
+        <!-- Header -->
+        <div class="header">
+          <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+          <h1>You're Invited!</h1>
+          <p class="tagline">Join your team on Signify iD</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+          <p class="greeting">Hello {{recipientName}},</p>
+
+          <p class="message">
+            You've been invited to join
+            <strong>{{organizationName}}</strong>
+            on Signify iD, our secure identity and access management platform.
+          </p>
+
+          <div class="invite-details">
+            <p><strong>Organization:</strong> {{organizationName}}</p>
+            <p><strong>Role:</strong> {{roleName}}</p>
+            {{#if invitedByName}}
+              <p><strong>Invited by:</strong> {{invitedByName}}</p>
+            {{/if}}
+          </div>
+
+          <p class="message">
+            Click the button below to accept your invitation and set up your
+            account:
+          </p>
+
+          <div style="text-align: center;">
+            <a href="{{inviteLink}}" class="cta-button">Accept Invitation</a>
+          </div>
+
+          <div class="expiry-notice">
+            <strong>⏰ This invitation expires in
+              {{expiresInDays}}
+              days.</strong>
+            Please accept it before it expires.
+          </div>
+
+          <hr class="divider" />
+
+          <p class="helper-text">
+            If you didn't expect this invitation, you can safely ignore this
+            email. If you have questions, contact us at
+            <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.
+          </p>
+
+          <p class="link-fallback">
+            <strong>Trouble with the button?</strong>
+            Copy and paste this link into your browser:<br />
+            <span>{{inviteLink}}</span>
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p>© {{year}} Signify iD. All rights reserved.</p>
+          <p>
+            This email was sent to
+            {{recipientEmail}}.<br />
+            <a href="{{frontendUrl}}">Visit Signify iD</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
