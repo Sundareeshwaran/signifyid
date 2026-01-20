@@ -12,8 +12,7 @@
   <a href="https://signifyid.vercel.app">🌐 Live Demo</a> •
   <a href="https://signifyid-api.vercel.app/api/health">🔌 API</a> •
   <a href="https://www.npmjs.com/package/signifyid-client">📦 NPM</a> •
-  <a href="#features">Features</a> •
-  <a href="#getting-started">Getting Started</a>
+  <a href="#features">Features</a>
 </p>
 
 <p align="center">
@@ -143,81 +142,8 @@ signifyid/
 │   ├── components/        # Reusable UI components
 │   ├── lib/               # Utilities and hooks
 │   └── types/             # TypeScript definitions
-│
-├── server/                # Express backend
-│   ├── src/
-│   │   ├── config/        # Database, Redis, logger
-│   │   ├── controllers/   # Route handlers
-│   │   ├── middleware/    # Auth, validation, etc.
-│   │   ├── models/        # Data access layer
-│   │   ├── routes/        # API endpoints
-│   │   ├── mail/          # Email templates
-│   │   └── scripts/       # Utility scripts
-│   └── prisma/            # Database schema
-│
 └── public/                # Static assets
 ```
-
----
-
-## 🏁 Getting Started
-
-### Prerequisites
-
-- **Node.js** 20+
-- **pnpm** (recommended) or npm
-- **PostgreSQL** 15+
-- **Redis** 7+
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/signifyid.git
-cd signifyid
-```
-
-### 2. Install Dependencies
-
-```bash
-# Install frontend dependencies
-pnpm install
-
-# Install backend dependencies
-cd server && pnpm install
-```
-
-### 3. Configure Environment
-
-```bash
-# Frontend (.env.local)
-cp env.template .env.local
-
-# Backend (server/.env)
-cp server/env.template server/.env
-```
-
-Edit both files with your configuration.
-
-### 4. Setup Database
-
-```bash
-cd server
-
-# Run migrations
-pnpm migrate
-```
-
-### 5. Start Development Servers
-
-```bash
-# Terminal 1 - Frontend (port 3000)
-pnpm dev
-
-# Terminal 2 - Backend (port 5000)
-cd server && pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ---
 
@@ -241,32 +167,10 @@ Full API documentation is available at `/docs` in the application.
 
 ## 🚀 Deployment
 
-### Production Build
+The platform is optimized for deployment on **Vercel** (Frontend) and scalable backend providers like **Railway** or **Render**.
 
-```bash
-# Build frontend
-pnpm build
-
-# Build backend
-cd server && pnpm build
-```
-
-### Environment Variables
-
-Ensure all production environment variables are set:
-
-- `DATABASE_URL` — PostgreSQL connection string
-- `REDIS_URL` — Redis connection string
-- `JWT_SECRET` — Strong random secret
-- `STRIPE_SECRET_KEY` — Stripe API key
-- `SMTP_*` — Email server configuration
-
-### Recommended Platforms
-
-- **Frontend**: Vercel, Netlify, AWS Amplify
-- **Backend**: Railway, Render, AWS ECS, DigitalOcean App Platform
-- **Database**: Supabase, Neon, AWS RDS
-- **Redis**: Upstash, Redis Cloud
+- **Frontend**: https://signifyid.vercel.app
+- **Backend**: https://signifyid-api.vercel.app
 
 ---
 
