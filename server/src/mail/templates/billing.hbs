@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing Notification</title>
+  <style>
+    /* Reset & Base */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #e5e5e5;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+    .email-wrapper {
+      background-color: #262626;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      border: 1px solid #404040;
+    }
+    /* Status-specific header colors */
+    .header-success {
+      background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+    }
+    .header-failed {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+    }
+    .header-refunded {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+    }
+    .header-cancelled {
+      background: linear-gradient(135deg, #525252 0%, #404040 50%, #333333 100%);
+    }
+    .header {
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header .status-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    /* Content */
+    .content {
+      padding: 32px 24px;
+    }
+    .greeting {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #f5f5f5;
+    }
+    .message {
+      margin-bottom: 24px;
+      color: #a3a3a3;
+      font-size: 16px;
+    }
+    .message strong {
+      color: #d97706;
+    }
+    /* Invoice Details Card */
+    .invoice-details {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      border: 1px solid #333333;
+    }
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #333333;
+    }
+    .invoice-row:last-child {
+      border-bottom: none;
+    }
+    .invoice-row .label {
+      color: #737373;
+      font-size: 14px;
+    }
+    .invoice-row .value {
+      font-weight: 600;
+      color: #f5f5f5;
+      font-size: 14px;
+    }
+    .amount-highlight {
+      font-size: 24px;
+      font-weight: 700;
+      color: #d97706 !important;
+    }
+    /* Status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-success {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-failed {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .status-refunded {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .status-cancelled {
+      background-color: rgba(115, 115, 115, 0.15);
+      color: #a3a3a3;
+      border: 1px solid rgba(115, 115, 115, 0.3);
+    }
+    /* Alert Boxes */
+    .alert-box {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .alert-warning {
+      background-color: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #eab308;
+    }
+    .alert-warning strong {
+      color: #facc15;
+    }
+    .alert-info {
+      background-color: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+    /* CTA Button */
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 16px 0;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    }
+    .buttons-row {
+      text-align: center;
+      margin: 24px 0;
+    }
+    /* Next Steps */
+    .next-steps {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+      border-left: 4px solid #d97706;
+      padding: 20px;
+      margin: 24px 0;
+      border-radius: 0 12px 12px 0;
+    }
+    .next-steps h4 {
+      margin: 0 0 12px 0;
+      color: #d97706;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .next-steps p {
+      margin: 0;
+      color: #a3a3a3;
+      font-size: 14px;
+    }
+    /* Footer */
+    .footer {
+      background-color: #1f1f1f;
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: #737373;
+      border-top: 1px solid #333333;
+    }
+    .footer a {
+      color: #d97706;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #404040;
+      margin: 24px 0;
+    }
+    /* Helper Text */
+    .helper-text {
+      font-size: 14px;
+      color: #737373;
+      text-align: center;
+    }
+    .helper-text a {
+      color: #d97706;
+      text-decoration: none;
+    }
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+      .content {
+        padding: 24px 16px;
+      }
+      .cta-button {
+        display: block;
+        text-align: center;
+      }
+      .invoice-row {
+        flex-direction: column;
+      }
+      .invoice-row .value {
+        margin-top: 4px;
+      }
+      .header h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="email-wrapper">
+      <!-- Header - dynamic based on event type -->
+      {{#if (eq eventType "success")}}
+      <div class="header header-success">
+        <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+        <div class="status-icon">✅</div>
+        <h1>Payment Successful</h1>
+      </div>
+      {{/if}}
+      {{#if (eq eventType "failed")}}
+      <div class="header header-failed">
+        <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+        <div class="status-icon">❌</div>
+        <h1>Payment Failed</h1>
+      </div>
+      {{/if}}
+      {{#if (eq eventType "refunded")}}
+      <div class="header header-refunded">
+        <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+        <div class="status-icon">💰</div>
+        <h1>Refund Processed</h1>
+      </div>
+      {{/if}}
+      {{#if (eq eventType "cancelled")}}
+      <div class="header header-cancelled">
+        <img src="{{logoUrl}}" alt="Signify iD" class="logo" />
+        <div class="status-icon">🚫</div>
+        <h1>Subscription Cancelled</h1>
+      </div>
+      {{/if}}
+
+      <!-- Content -->
+      <div class="content">
+        <p class="greeting">Hello {{recipientName}},</p>
+        
+        {{#if (eq eventType "success")}}
+        <p class="message">
+          Thank you for your payment! Your subscription for <strong>{{organizationName}}</strong> 
+          has been successfully processed.
+        </p>
+        {{/if}}
+
+        {{#if (eq eventType "failed")}}
+        <p class="message">
+          We were unable to process your payment for <strong>{{organizationName}}</strong>. 
+          Please update your payment method to continue using our services.
+        </p>
+        <div class="alert-box alert-warning">
+          <strong>⚠️ Action Required:</strong> Please update your payment information to avoid 
+          service interruption.
+        </div>
+        {{/if}}
+
+        {{#if (eq eventType "refunded")}}
+        <p class="message">
+          A refund has been processed for your <strong>{{organizationName}}</strong> account. 
+          The funds should appear in your account within 5-10 business days.
+        </p>
+        {{/if}}
+
+        {{#if (eq eventType "cancelled")}}
+        <p class="message">
+          Your subscription for <strong>{{organizationName}}</strong> has been cancelled. 
+          Your access will continue until the end of your current billing period.
+        </p>
+        {{/if}}
+
+        <!-- Invoice Details -->
+        {{#if invoiceId}}
+        <div class="invoice-details">
+          <div class="invoice-row">
+            <span class="label">Invoice ID</span>
+            <span class="value">{{invoiceId}}</span>
+          </div>
+          {{#if planName}}
+          <div class="invoice-row">
+            <span class="label">Plan</span>
+            <span class="value">{{planName}}</span>
+          </div>
+          {{/if}}
+          {{#if amount}}
+          <div class="invoice-row">
+            <span class="label">Amount</span>
+            <span class="value amount-highlight">{{amount}}</span>
+          </div>
+          {{/if}}
+          <div class="invoice-row">
+            <span class="label">Status</span>
+            <span class="value">
+              {{#if (eq eventType "success")}}
+              <span class="status-badge status-success">Paid</span>
+              {{/if}}
+              {{#if (eq eventType "failed")}}
+              <span class="status-badge status-failed">Failed</span>
+              {{/if}}
+              {{#if (eq eventType "refunded")}}
+              <span class="status-badge status-refunded">Refunded</span>
+              {{/if}}
+              {{#if (eq eventType "cancelled")}}
+              <span class="status-badge status-cancelled">Cancelled</span>
+              {{/if}}
+            </span>
+          </div>
+        </div>
+        {{/if}}
+
+        <!-- Next Steps -->
+        {{#if nextSteps}}
+        <div class="next-steps">
+          <h4>📋 Next Steps</h4>
+          <p>{{nextSteps}}</p>
+        </div>
+        {{/if}}
+
+        <div class="buttons-row">
+          <a href="{{portalLink}}" class="cta-button">
+            {{#if (eq eventType "failed")}}
+            Update Payment Method
+            {{else}}
+            Manage Billing
+            {{/if}}
+          </a>
+        </div>
+
+        <hr class="divider">
+
+        <p class="helper-text">
+          Questions about your billing?<br>
+          Contact us at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>© {{year}} Signify iD. All rights reserved.</p>
+        <p>
+          <a href="{{frontendUrl}}">Visit Signify iD</a> | 
+          <a href="{{portalLink}}">Billing Portal</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
