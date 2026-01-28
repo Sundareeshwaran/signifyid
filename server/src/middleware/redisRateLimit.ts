@@ -123,7 +123,7 @@ export const sensitiveRateLimiter: RequestHandler = createRedisRateLimiter({
   keyPrefix: "sensitive",
   message: {
     error: "too_many_requests",
-    error_description: "Too many attempts. Please try again in 1 minute.",
+    error_description: "Too many attempts. Please try again later.",
   },
 });
 
