@@ -27,6 +27,17 @@ interface LoginResponseData {
   error_description?: string;
 }
 
+/**
+ * Render the client authentication UI and perform the client credential login flow.
+ *
+ * The component renders a form for Client ID and Client Secret, sends those credentials
+ * (and an optional redirect URI from the page query parameters) to the API, displays
+ * error messages returned by the server or encountered locally, and on success
+ * redirects the browser to the backend-provided redirect URI (with session token appended
+ * when available) or navigates to a default success page.
+ *
+ * @returns The React element containing the client login form and related UI.
+ */
 function ClientLoginContent() {
   const router = useRouter();
   const [lastResponse, setLastResponse] = useState<LoginResponseData | null>(

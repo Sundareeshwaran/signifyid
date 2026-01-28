@@ -42,6 +42,15 @@ function ClientProtectedContent() {
   const tokenFromUrl = searchParams.get("token");
 
   useEffect(() => {
+    /**
+     * Validate the current client session with the backend and update component state.
+     *
+     * Sends a request to the session validation endpoint and:
+     * - sets `sessionInfo` to the returned session object when valid
+     * - sets `error` to the server-provided message or `"Session invalid"` when the session is invalid
+     * - on network or parsing errors, sets `error` to `"Failed to validate session"` and `sessionInfo` to `{ valid: false }`
+     * Always sets the loading flag to `false` when finished.
+     */
     async function validateSession() {
       try {
         const rawApiUrl =

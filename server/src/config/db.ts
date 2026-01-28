@@ -37,7 +37,13 @@ pool.on("error", (err) => {
 });
 
 /**
- * Execute a query with parameters
+ * Execute a SQL query against the configured connection pool.
+ *
+ * Logs a truncated debug entry with execution duration and row count when running in development.
+ *
+ * @param text - The SQL query string to execute
+ * @param params - Optional parameter values for the query
+ * @returns The PostgreSQL query result containing rows and metadata
  */
 export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   text: string,
@@ -67,13 +73,13 @@ export async function getClient() {
 }
 
 /**
- * Execute a query with RLS context pre-set.
- * This sets the session variables before running the query.
+ * Run a SQL query with session-level Row-Level Security context set for the given organization and user.
  *
- * @param text - SQL query text
- * @param params - Query parameters
- * @param orgId - Organization UUID for RLS context
- * @param userId - User UUID for RLS context
+ * This sets the session variables `app.current_org_id` and `app.current_user_id` on the acquired connection before executing the query.
+ *
+ * @param orgId - Organization UUID used to set `app.current_org_id` for the session
+ * @param userId - User UUID used to set `app.current_user_id` for the session
+ * @returns The PostgreSQL query result
  */
 export async function queryWithRLS<
   T extends pg.QueryResultRow = pg.QueryResultRow,

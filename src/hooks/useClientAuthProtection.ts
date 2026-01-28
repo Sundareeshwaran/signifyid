@@ -73,6 +73,23 @@ interface UseClientAuthProtectionReturn {
 const DEFAULT_API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
+/**
+ * Protects client routes by verifying session authentication and handling redirects to the client login page.
+ *
+ * @param options - Configuration for the protection behavior:
+ *   - `redirectTo` — URL to send unauthenticated users (default: `/client/login`).
+ *   - `apiUrl` — base API URL used for validation and logout (default: `NEXT_PUBLIC_API_URL` or `http://localhost:5000/api`); trailing slashes are removed.
+ *   - `publicPaths` — array of paths that do not require authentication (default: [`/client/login`, `/client/register`, `/`]).
+ *   - `skipRedirect` — when true, prevent automatic redirect for unauthenticated users.
+ *   - `onAuthChecked` — optional callback invoked with the boolean authentication result after a check.
+ * @returns An object with:
+ *   - `isAuthenticated` — `true` if a valid client session exists, `false` otherwise.
+ *   - `isLoading` — `true` while an authentication check is in progress.
+ *   - `session` — the current `ClientSession` object when authenticated, or `null`.
+ *   - `error` — an error message when validation fails, or `null`.
+ *   - `revalidate` — function to re-check the session immediately.
+ *   - `logout` — function that attempts server logout, clears session state, and redirects to the login page with `redirect_uri`.
+ */
 export function useClientAuthProtection(
   options: UseClientAuthProtectionOptions = {},
 ): UseClientAuthProtectionReturn {

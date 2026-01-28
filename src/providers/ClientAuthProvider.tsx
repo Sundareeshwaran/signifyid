@@ -62,6 +62,21 @@ interface ClientAuthProviderProps {
   revalidateInterval?: number;
 }
 
+/**
+ * Provides client authentication state and controls to descendant components.
+ *
+ * The provider normalizes the API base URL, checks and revalidates the client session,
+ * exposes `isAuthenticated`, `isLoading`, `session`, `error`, `revalidate`, and `logout`,
+ * and redirects to the configured login path when necessary.
+ *
+ * @param children - React children to render inside the provider
+ * @param apiUrl - Base API URL or environment variable; trailing slashes are removed before use
+ * @param loginPath - Path to the login page; used for redirects after logout or session expiry
+ * @param publicPaths - Paths that do not require authentication; exact matches or prefixes are allowed
+ * @param autoCheck - When true, performs an authentication check on mount (defaults to true)
+ * @param revalidateInterval - Interval in milliseconds to periodically revalidate the session; 0 disables periodic checks
+ * @returns The ClientAuthContext provider wrapping the given children
+ */
 export function ClientAuthProvider({
   children,
   apiUrl: rawApiUrl = process.env.NEXT_PUBLIC_API_URL ||

@@ -47,6 +47,11 @@ function isClientProtectedPath(pathname: string): boolean {
   return pathname.startsWith("/client/") && !isPublicPath(pathname);
 }
 
+/**
+ * Enforces client authentication for protected routes, validating session cookies and redirecting unauthenticated or invalid sessions to the client login page.
+ *
+ * @returns A NextResponse that either allows the request to proceed for public paths or a valid client session, or redirects to /client/login (clearing the `clientSession` cookie when the session is invalid or validation fails).
+ */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 

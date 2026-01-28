@@ -6,7 +6,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import app from "../src/app.js";
 
-// Handle Vercel requests with explicit CORS for preflight
+/**
+ * Handles incoming Vercel requests with explicit CORS handling and forwards non-preflight requests to the Express app.
+ *
+ * Sets CORS response headers based on the request Origin (allowing the configured frontend URL or localhost origins).
+ * Responds to preflight OPTIONS requests with a 204 No Content and an empty body; all other requests are passed through to the Express app.
+ *
+ * @returns The HTTP response sent to the client: for OPTIONS requests, a 204 No Content with an empty body; for other requests, the response produced by the Express app.
+ */
 export default function handler(req: VercelRequest, res: VercelResponse) {
   // Get the requesting origin
   const requestOrigin = req.headers.origin || "";

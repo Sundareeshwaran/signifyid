@@ -20,6 +20,13 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
+/**
+ * Validates a client session using query parameters and a backend call, displays a status UI while validating, and redirects the user to a safe destination or to the login page on failure.
+ *
+ * The component reads `redirect_uri` or `redirect` (and `token` if present) from the URL query string, presents "validating", "success", or "error" states to the user, and performs safe navigation after verification or on error.
+ *
+ * @returns The JSX element rendering the verification status and related UI.
+ */
 function ClientCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
