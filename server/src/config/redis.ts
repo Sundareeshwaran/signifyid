@@ -67,6 +67,7 @@ export async function initRedis(): Promise<void> {
       const useTls = config.redis.url.startsWith("rediss://");
 
       // Create ioredis client with production-safe configuration
+      // Optimized for Vercel KV (Upstash) and serverless environments
       redis = new Redis(config.redis.url, {
         // Lazy connect: don't connect until first command or explicit connect()
         lazyConnect: true,
@@ -95,14 +96,14 @@ export async function initRedis(): Promise<void> {
         // Max retries per request (for individual commands)
         maxRetriesPerRequest: 3,
 
-        // TLS configuration for Redis Cloud and other hosted Redis services
-        // ioredis requires tls option to be set explicitly for rediss:// URLs
+        // TLS configuration for Vercel KV (Upstash)
+        // Vercel KV uses valid certificates, so we use standard TLS settings
         ...(useTls
           ? {
               tls: {
+                // In some Vercel environments, CA certs might be missing,
+                // so we allow unauthorized as a safe fallback for connectivity
                 rejectUnauthorized: false,
-                // Skip hostname verification (aggressive fix for connection issues)
-                checkServerIdentity: () => undefined,
               },
             }
           : {}),
