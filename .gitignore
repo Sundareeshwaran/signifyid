@@ -228,3 +228,4 @@ public/uploads/
 !.env.example
 !.env.template
 !env.template
+.vercel
