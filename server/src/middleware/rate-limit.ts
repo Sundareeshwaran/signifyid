@@ -81,20 +81,21 @@ export const tokenRateLimiter = rateLimit({
  * Very strict limit: 3 attempts per 15 minutes to prevent brute force
  */
 export const clientLoginRateLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
+  windowMs: 15 * 60 * 1000, // 15 minutes
   max: 3, // 3 requests per window
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     error: "too_many_requests",
-    error_description: "Too many login attempts. Please try again in 1 minute.",
+    error_description:
+      "Too many login attempts. Please try again in 15 minutes.",
   },
   handler: (req: Request, res: Response) => {
     res.status(429).json({
       error: "too_many_requests",
       error_description:
-        "Too many login attempts. Please try again in 1 minute.",
-      retry_after: 60, // 1 minute in seconds
+        "Too many login attempts. Please try again in 15 minutes.",
+      retry_after: 900, // 15 minutes in seconds
     });
   },
 });

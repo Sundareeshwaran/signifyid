@@ -39,7 +39,7 @@ function getClientIp(req: Request): string {
  * Create a Redis-backed rate limiter
  */
 export function createRedisRateLimiter(
-  options: RateLimitOptions,
+  options: RateLimitOptions
 ): RequestHandler {
   const {
     windowMs,
@@ -54,7 +54,7 @@ export function createRedisRateLimiter(
   return async (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ): Promise<void> => {
     // Generate rate limit key
     const identifier = keyGenerator(req);
@@ -65,7 +65,7 @@ export function createRedisRateLimiter(
       identifier,
       endpoint,
       max,
-      windowSeconds,
+      windowSeconds
     );
 
     // Set rate limit headers
@@ -73,12 +73,12 @@ export function createRedisRateLimiter(
     res.setHeader("RateLimit-Remaining", result.remaining);
     res.setHeader(
       "RateLimit-Reset",
-      Math.ceil(result.resetAt.getTime() / 1000),
+      Math.ceil(result.resetAt.getTime() / 1000)
     );
 
     if (!result.allowed) {
       const retryAfter = Math.ceil(
-        (result.resetAt.getTime() - Date.now()) / 1000,
+        (result.resetAt.getTime() - Date.now()) / 1000
       );
       res.setHeader("Retry-After", retryAfter);
 
@@ -118,12 +118,12 @@ export const apiRateLimiter: RequestHandler = createRedisRateLimiter({
 
 // Very strict rate limiter for sensitive operations (3 per 15 minutes)
 export const sensitiveRateLimiter: RequestHandler = createRedisRateLimiter({
-  windowMs: 5 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   max: 3,
   keyPrefix: "sensitive",
   message: {
     error: "too_many_requests",
-    error_description: "Too many attempts. Please try again in 1 minute.",
+    error_description: "Too many attempts. Please try again in 15 minutes.",
   },
 });
 
