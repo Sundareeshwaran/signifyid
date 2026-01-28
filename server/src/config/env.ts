@@ -27,8 +27,11 @@ export const config = {
 
   // Cookies
   cookie: {
-    secure: process.env.COOKIE_SECURE === "true",
-    sameSite: (process.env.COOKIE_SAMESITE || "Lax") as
+    secure:
+      process.env.COOKIE_SECURE === "true" ||
+      process.env.NODE_ENV === "production",
+    sameSite: (process.env.COOKIE_SAMESITE ||
+      (process.env.NODE_ENV === "production" ? "None" : "Lax")) as
       | "Lax"
       | "Strict"
       | "None",
