@@ -38,7 +38,7 @@ export async function store(
       createdAt: new Date().toISOString(),
     };
 
-    await redis.setex(
+    await redis.setEx(
       getKey(`${OTP_PREFIX}${identifier}`),
       ttlSeconds,
       JSON.stringify(data),
@@ -83,7 +83,7 @@ export async function verify(
     stored.attempts++;
     const ttl = await redis.ttl(key);
     if (ttl > 0) {
-      await redis.setex(key, ttl, JSON.stringify(stored));
+      await redis.setEx(key, ttl, JSON.stringify(stored));
     }
 
     // Verify code

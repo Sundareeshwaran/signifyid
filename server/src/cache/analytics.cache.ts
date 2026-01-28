@@ -61,7 +61,7 @@ export async function set<T>(
     const ttl = ttlSeconds ?? TTL_CONFIG[type];
     const key = getKey(`${ANALYTICS_PREFIX}${type}:${orgId}`);
 
-    await redis.setex(key, ttl, JSON.stringify(data));
+    await redis.setEx(key, ttl, JSON.stringify(data));
   });
 }
 

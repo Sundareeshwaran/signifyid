@@ -58,7 +58,7 @@ export async function store(
     const redis = getRedis();
     if (!redis) return false;
 
-    await redis.setex(getKey(fullKey), ttlSeconds, challenge);
+    await redis.setEx(getKey(fullKey), ttlSeconds, challenge);
     return true;
   });
 

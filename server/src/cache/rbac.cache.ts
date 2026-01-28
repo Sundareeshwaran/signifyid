@@ -60,7 +60,7 @@ export async function setPermissions(
       cachedAt: new Date().toISOString(),
     };
 
-    await redis.setex(
+    await redis.setEx(
       getKey(`${RBAC_PREFIX}${userId}`),
       ttlSeconds,
       JSON.stringify(data),
