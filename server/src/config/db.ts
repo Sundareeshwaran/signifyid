@@ -20,6 +20,9 @@ export const pool = new Pool({
   connectionTimeoutMillis: 5000,
   // Neon requires SSL; local dev typically doesn't
   ssl: isNeonConnection ? { rejectUnauthorized: false } : false,
+  // Keep connections alive to prevent timeout errors
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 // Test connection on startup
@@ -38,7 +41,7 @@ pool.on("error", (err) => {
  */
 export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   text: string,
-  params?: unknown[]
+  params?: unknown[],
 ): Promise<pg.QueryResult<T>> {
   const start = Date.now();
   const result = await pool.query<T>(text, params);
@@ -73,12 +76,12 @@ export async function getClient() {
  * @param userId - User UUID for RLS context
  */
 export async function queryWithRLS<
-  T extends pg.QueryResultRow = pg.QueryResultRow
+  T extends pg.QueryResultRow = pg.QueryResultRow,
 >(
   text: string,
   params: unknown[] = [],
   orgId: string,
-  userId: string
+  userId: string,
 ): Promise<pg.QueryResult<T>> {
   const client = await pool.connect();
   const start = Date.now();
@@ -88,7 +91,7 @@ export async function queryWithRLS<
     await client.query(
       `SELECT set_config('app.current_org_id', $1, true),
               set_config('app.current_user_id', $2, true)`,
-      [orgId, userId]
+      [orgId, userId],
     );
 
     const result = await client.query<T>(text, params);

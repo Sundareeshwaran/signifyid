@@ -4,7 +4,10 @@
  * API functions for client authentication
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+// Normalize API URL - remove trailing slashes to prevent double-slash CORS issues
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+).replace(/\/+$/, "");
 
 export interface ClientLoginRequest {
   client_id: string;

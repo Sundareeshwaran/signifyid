@@ -44,8 +44,10 @@ function ClientProtectedContent() {
   useEffect(() => {
     async function validateSession() {
       try {
-        const apiUrl =
+        const rawApiUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        // Normalize API URL - remove trailing slashes to prevent double-slash issues
+        const apiUrl = rawApiUrl.replace(/\/+$/, "");
 
         const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
           method: "GET",
@@ -78,8 +80,10 @@ function ClientProtectedContent() {
 
   const handleLogout = async () => {
     try {
-      const apiUrl =
+      const rawApiUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      // Normalize API URL - remove trailing slashes to prevent double-slash issues
+      const apiUrl = rawApiUrl.replace(/\/+$/, "");
       await fetch(`${apiUrl}/client-auth/logout`, {
         method: "POST",
         credentials: "include",

@@ -75,8 +75,10 @@ export async function proxy(request: NextRequest) {
 
     // Session cookie exists - validate with backend
     try {
-      const apiUrl =
+      const rawApiUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      // Normalize API URL - remove trailing slashes to prevent double-slash issues
+      const apiUrl = rawApiUrl.replace(/\/+$/, "");
       const validateResponse = await fetch(
         `${apiUrl}/client-auth/session/validate`,
         {

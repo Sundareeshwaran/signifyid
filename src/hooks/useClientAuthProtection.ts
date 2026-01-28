@@ -78,11 +78,14 @@ export function useClientAuthProtection(
 ): UseClientAuthProtectionReturn {
   const {
     redirectTo = "/client/login",
-    apiUrl = DEFAULT_API_URL,
+    apiUrl: rawApiUrl = DEFAULT_API_URL,
     publicPaths = ["/client/login", "/client/register", "/"],
     skipRedirect = false,
     onAuthChecked,
   } = options;
+
+  // Normalize API URL - remove trailing slashes to prevent double-slash issues
+  const apiUrl = rawApiUrl.replace(/\/+$/, "");
 
   const router = useRouter();
   const pathname = usePathname();

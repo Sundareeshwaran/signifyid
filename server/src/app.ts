@@ -100,6 +100,9 @@ app.use(
   }),
 );
 
+// Handle preflight requests explicitly to prevent redirects
+app.options("*", cors());
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes

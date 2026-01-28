@@ -64,12 +64,16 @@ interface ClientAuthProviderProps {
 
 export function ClientAuthProvider({
   children,
-  apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  apiUrl: rawApiUrl = process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:5000/api",
   loginPath = "/client/login",
   publicPaths = ["/client/login", "/client/register", "/"],
   autoCheck = true,
   revalidateInterval = 0,
 }: ClientAuthProviderProps) {
+  // Normalize API URL - remove trailing slashes to prevent double-slash issues
+  const apiUrl = rawApiUrl.replace(/\/+$/, "");
+
   const router = useRouter();
   const pathname = usePathname();
 
