@@ -118,12 +118,12 @@ export const apiRateLimiter: RequestHandler = createRedisRateLimiter({
 
 // Very strict rate limiter for sensitive operations (3 per 15 minutes)
 export const sensitiveRateLimiter: RequestHandler = createRedisRateLimiter({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 5 * 60 * 1000,
   max: 3,
   keyPrefix: "sensitive",
   message: {
     error: "too_many_requests",
-    error_description: "Too many attempts. Please try again in 15 minutes.",
+    error_description: "Too many attempts. Please try again in 1 minute.",
   },
 });
 

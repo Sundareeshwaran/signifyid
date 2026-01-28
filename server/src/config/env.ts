@@ -108,18 +108,18 @@ if (config.nodeEnv === "production") {
   // Cookie security validation
   if (!config.cookie.secure) {
     console.warn(
-      "⚠️ SECURITY WARNING: Cookie secure flag is disabled in production!"
+      "⚠️ SECURITY WARNING: Cookie secure flag is disabled in production!",
     );
   }
   if (config.cookie.sameSite === "None" && !config.cookie.secure) {
     throw new Error(
-      "SECURITY ERROR: SameSite=None requires Secure cookies in production"
+      "SECURITY ERROR: SameSite=None requires Secure cookies in production",
     );
   }
   // JWT secret length validation
   if (config.jwt.secret.length < 32) {
     console.warn(
-      "⚠️ SECURITY WARNING: JWT secret should be at least 32 characters"
+      "⚠️ SECURITY WARNING: JWT secret should be at least 32 characters",
     );
   }
 }
