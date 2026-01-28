@@ -81,12 +81,12 @@ app.use(
       if (!origin) {
         return callback(null, true);
       }
-      // Check if origin is in allowed list
-      // Check if origin is in allowed list or if it's a localhost in development
+      // Check if origin is in allowed list or localhost (for SDK development)
+      // Allow localhost in all environments so SDK developers can test against production
       if (
         allowedOrigins.includes(origin) ||
-        (config.nodeEnv === "development" &&
-          origin.startsWith("http://localhost"))
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:")
       ) {
         return callback(null, origin);
       }
