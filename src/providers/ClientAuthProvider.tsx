@@ -45,7 +45,7 @@ interface ClientAuthContextValue {
 }
 
 const ClientAuthContext = createContext<ClientAuthContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 interface ClientAuthProviderProps {
@@ -64,7 +64,7 @@ interface ClientAuthProviderProps {
 
 export function ClientAuthProvider({
   children,
-  apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
   loginPath = "/client/login",
   publicPaths = ["/client/login", "/client/register", "/"],
   autoCheck = true,
@@ -81,23 +81,20 @@ export function ClientAuthProvider({
   // Check if current path is public
   const isPublicPath = useMemo(() => {
     return publicPaths.some(
-      (path) => pathname === path || pathname.startsWith(path + "/")
+      (path) => pathname === path || pathname.startsWith(path + "/"),
     );
   }, [pathname, publicPaths]);
 
   // Validate session with backend
   const validateSession = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(
-        `${apiUrl}/api/client-auth/session/validate`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 
@@ -136,7 +133,7 @@ export function ClientAuthProvider({
   // Logout function
   const logout = useCallback(async () => {
     try {
-      await fetch(`${apiUrl}/api/client-auth/logout`, {
+      await fetch(`${apiUrl}/client-auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -217,7 +214,7 @@ export function ClientAuthProvider({
       revalidate,
       logout,
     }),
-    [isAuthenticated, isLoading, session, error, revalidate, logout]
+    [isAuthenticated, isLoading, session, error, revalidate, logout],
   );
 
   return (

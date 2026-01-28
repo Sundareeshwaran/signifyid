@@ -4,7 +4,7 @@
  * API functions for client authentication
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export interface ClientLoginRequest {
   client_id: string;
@@ -33,9 +33,9 @@ export interface ClientSessionValidateResponse {
  * Login client with Client ID + Secret
  */
 export async function loginClient(
-  data: ClientLoginRequest
+  data: ClientLoginRequest,
 ): Promise<ClientLoginResponse> {
-  const response = await fetch(`${API_BASE}/api/client-auth/login`, {
+  const response = await fetch(`${API_BASE}/client-auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export async function loginClient(
  * Validate active client session
  */
 export async function validateClientSession(): Promise<ClientSessionValidateResponse> {
-  const response = await fetch(`${API_BASE}/api/client-auth/session/validate`, {
+  const response = await fetch(`${API_BASE}/client-auth/session/validate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export async function validateClientSession(): Promise<ClientSessionValidateResp
  * Logout client (revoke session)
  */
 export async function logoutClient(): Promise<{ success: boolean }> {
-  const response = await fetch(`${API_BASE}/api/client-auth/logout`, {
+  const response = await fetch(`${API_BASE}/client-auth/logout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

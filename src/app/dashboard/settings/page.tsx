@@ -39,7 +39,7 @@ import { settingsApi, organizationsApi } from "@/lib/api";
 import Link from "next/link";
 import Image from "next/image";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 interface OrgSettings {
   id: string;
@@ -492,7 +492,7 @@ function SettingsContent() {
                             ? Math.round(
                                 (security.mfaEnabledUsers /
                                   security.totalUsers) *
-                                  100
+                                  100,
                               )
                             : 0}
                           %
@@ -619,7 +619,7 @@ function SettingsContent() {
                         <div className="flex justify-center p-4 bg-white rounded-lg">
                           <Image
                             src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                              enrollment.totpUri
+                              enrollment.totpUri,
                             )}`}
                             alt="MFA QR Code"
                             width={200}
@@ -780,8 +780,8 @@ function SettingsContent() {
                           {org?.plan === "professional"
                             ? "Professional Plan"
                             : org?.plan === "starter"
-                            ? "Starter Plan"
-                            : "Free Plan"}
+                              ? "Starter Plan"
+                              : "Free Plan"}
                         </h3>
                         <p className="text-muted-foreground">
                           Current subscription
@@ -797,32 +797,32 @@ function SettingsContent() {
                         {org?.plan === "professional"
                           ? "Up to 500 users"
                           : org?.plan === "starter"
-                          ? "Up to 50 users"
-                          : "Up to 5 users"}
+                            ? "Up to 50 users"
+                            : "Up to 5 users"}
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         {org?.plan === "professional"
                           ? "Unlimited OAuth clients"
                           : org?.plan === "starter"
-                          ? "Up to 10 OAuth clients"
-                          : "Up to 2 OAuth clients"}
+                            ? "Up to 10 OAuth clients"
+                            : "Up to 2 OAuth clients"}
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         {org?.plan === "professional"
                           ? "Advanced MFA"
                           : org?.plan === "starter"
-                          ? "MFA (TOTP + WebAuthn)"
-                          : "Basic MFA (TOTP)"}
+                            ? "MFA (TOTP + WebAuthn)"
+                            : "Basic MFA (TOTP)"}
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         {org?.plan === "professional"
                           ? "1-year audit logs"
                           : org?.plan === "starter"
-                          ? "30-day audit logs"
-                          : "7-day audit logs"}
+                            ? "30-day audit logs"
+                            : "7-day audit logs"}
                       </li>
                       {(org?.plan === "starter" ||
                         org?.plan === "professional") && (

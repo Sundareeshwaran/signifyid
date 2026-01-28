@@ -47,7 +47,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 interface AuditLog {
   id: string;
@@ -120,7 +120,7 @@ export default function LogsPage() {
         `${API_URL}/logs?page=${page}&limit=${limit}`,
         {
           credentials: "include",
-        }
+        },
       );
       const data = await response.json();
 
@@ -209,7 +209,7 @@ export default function LogsPage() {
   const startRecord = (pagination.page - 1) * pagination.limit + 1;
   const endRecord = Math.min(
     pagination.page * pagination.limit,
-    pagination.total
+    pagination.total,
   );
 
   return (
@@ -404,7 +404,7 @@ export default function LogsPage() {
                           >
                             {pageNum}
                           </Button>
-                        )
+                        ),
                       )}
                     </div>
 
