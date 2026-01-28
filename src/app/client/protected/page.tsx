@@ -45,18 +45,15 @@ function ClientProtectedContent() {
     async function validateSession() {
       try {
         const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-        const response = await fetch(
-          `${apiUrl}/api/client-auth/session/validate`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         const data = await response.json();
 
@@ -81,8 +78,9 @@ function ClientProtectedContent() {
 
   const handleLogout = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      await fetch(`${apiUrl}/api/client-auth/logout`, {
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      await fetch(`${apiUrl}/client-auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -218,7 +216,7 @@ function ClientProtectedContent() {
                 onClick={() => {
                   const currentUrl = window.location.href;
                   router.push(
-                    `/client/login?redirect=${encodeURIComponent(currentUrl)}`
+                    `/client/login?redirect=${encodeURIComponent(currentUrl)}`,
                   );
                 }}
               >

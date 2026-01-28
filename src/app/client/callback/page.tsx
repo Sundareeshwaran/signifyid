@@ -24,7 +24,7 @@ function ClientCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"validating" | "success" | "error">(
-    "validating"
+    "validating",
   );
   const [message, setMessage] = useState("Verifying your session...");
 
@@ -38,18 +38,15 @@ function ClientCallbackContent() {
 
         // Validate session with backend
         const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-        const response = await fetch(
-          `${apiUrl}/api/client-auth/session/validate`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         const data = await response.json();
 
@@ -61,7 +58,7 @@ function ClientCallbackContent() {
           const safeRedirect = getSafeRedirectUrl(
             redirectUri,
             "/client/success",
-            [] // Allow same-origin only
+            [], // Allow same-origin only
           );
 
           // Small delay for user feedback
@@ -73,7 +70,7 @@ function ClientCallbackContent() {
           setStatus("error");
           setMessage(
             data.error_description ||
-              "Session validation failed. Please login again."
+              "Session validation failed. Please login again.",
           );
 
           // Redirect to login after showing error
