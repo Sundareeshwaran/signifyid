@@ -30,7 +30,7 @@ interface LoginResponseData {
 function ClientLoginContent() {
   const router = useRouter();
   const [lastResponse, setLastResponse] = useState<LoginResponseData | null>(
-    null
+    null,
   );
   const searchParams = useSearchParams();
   const [clientId, setClientId] = useState("");
@@ -52,11 +52,12 @@ function ClientLoginContent() {
     setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
       // Send the redirect_uri from query params to backend
       // Backend will validate against registered URIs and return final redirect
-      const response = await fetch(`${apiUrl}/api/client-auth/login`, {
+      const response = await fetch(`${apiUrl}/client-auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

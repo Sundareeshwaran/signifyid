@@ -67,7 +67,7 @@ export async function proxy(request: NextRequest) {
       loginUrl.searchParams.set("error", "no_session");
 
       console.log(
-        `[ClientAuth] No session, redirecting: ${pathname} -> /client/login`
+        `[ClientAuth] No session, redirecting: ${pathname} -> /client/login`,
       );
 
       return NextResponse.redirect(loginUrl);
@@ -75,9 +75,10 @@ export async function proxy(request: NextRequest) {
 
     // Session cookie exists - validate with backend
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
       const validateResponse = await fetch(
-        `${apiUrl}/api/client-auth/session/validate`,
+        `${apiUrl}/client-auth/session/validate`,
         {
           method: "GET",
           headers: {
@@ -85,7 +86,7 @@ export async function proxy(request: NextRequest) {
             "Content-Type": "application/json",
             Origin: request.nextUrl.origin,
           },
-        }
+        },
       );
 
       const validationResult = await validateResponse.json();
@@ -96,11 +97,11 @@ export async function proxy(request: NextRequest) {
         loginUrl.searchParams.set("redirect", request.url);
         loginUrl.searchParams.set(
           "error",
-          validationResult.error || "invalid_session"
+          validationResult.error || "invalid_session",
         );
 
         console.log(
-          `[ClientAuth] Invalid session (${validationResult.error}), redirecting: ${pathname}`
+          `[ClientAuth] Invalid session (${validationResult.error}), redirecting: ${pathname}`,
         );
 
         const response = NextResponse.redirect(loginUrl);
@@ -115,7 +116,7 @@ export async function proxy(request: NextRequest) {
       // API error - fail closed for security (redirect to login)
       console.error(
         `[ClientAuth] Validation API error for ${pathname}:`,
-        error
+        error,
       );
 
       const loginUrl = new URL("/client/login", request.url);

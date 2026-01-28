@@ -71,10 +71,10 @@ interface UseClientAuthProtectionReturn {
 }
 
 const DEFAULT_API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export function useClientAuthProtection(
-  options: UseClientAuthProtectionOptions = {}
+  options: UseClientAuthProtectionOptions = {},
 ): UseClientAuthProtectionReturn {
   const {
     redirectTo = "/client/login",
@@ -95,23 +95,20 @@ export function useClientAuthProtection(
   // Check if current path is public
   const isPublicPath = useCallback(() => {
     return publicPaths.some(
-      (path) => pathname === path || pathname.startsWith(path + "/")
+      (path) => pathname === path || pathname.startsWith(path + "/"),
     );
   }, [pathname, publicPaths]);
 
   // Validate session against API
   const validateSession = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(
-        `${apiUrl}/api/client-auth/session/validate`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 
@@ -150,7 +147,7 @@ export function useClientAuthProtection(
   // Logout function
   const logout = useCallback(async () => {
     try {
-      await fetch(`${apiUrl}/api/client-auth/logout`, {
+      await fetch(`${apiUrl}/client-auth/logout`, {
         method: "POST",
         credentials: "include",
       });
