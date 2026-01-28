@@ -36,6 +36,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Role, hasPermission } from "@/lib/rbac";
 import Link from "next/link";
 
@@ -185,9 +190,60 @@ export function ClientsTable({
                         {client.redirectUris[0]}
                       </span>
                       {client.redirectUris.length > 1 && (
-                        <Badge variant="outline" className="text-xs w-fit">
-                          +{client.redirectUris.length - 1} more
-                        </Badge>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className="text-xs w-fit cursor-pointer hover:bg-accent"
+                            >
+                              +{client.redirectUris.length - 1} more
+                            </Badge>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 p-4">
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <h4 className="font-medium text-sm text-foreground">
+                                  Redirect URIs
+                                </h4>
+                                <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
+                                  {client.redirectUris.map((uri) => (
+                                    <div
+                                      key={uri}
+                                      className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-2 rounded border"
+                                    >
+                                      <Link
+                                        href={uri}
+                                        target="_blank"
+                                        className="shrink-0"
+                                      >
+                                        <ExternalLink className="h-3 w-3" />
+                                      </Link>
+                                      <span className="truncate" title={uri}>
+                                        {uri}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <h4 className="font-medium text-sm text-foreground">
+                                  Scopes
+                                </h4>
+                                <div className="flex flex-wrap gap-1">
+                                  {client.scopes.map((scope) => (
+                                    <Badge
+                                      key={scope}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {scope}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       )}
                     </>
                   ) : (
