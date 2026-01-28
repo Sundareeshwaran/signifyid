@@ -24,7 +24,7 @@ interface CachedPermissions {
  * Get cached permissions for a user
  */
 export async function getPermissions(
-  userId: string
+  userId: string,
 ): Promise<{ roles: string[]; permissions: string[] } | null> {
   return safeRedisOp(async () => {
     const redis = getRedis();
@@ -48,7 +48,7 @@ export async function setPermissions(
   userId: string,
   roles: string[],
   permissions: string[],
-  ttlSeconds: number = DEFAULT_TTL_SECONDS
+  ttlSeconds: number = DEFAULT_TTL_SECONDS,
 ): Promise<void> {
   await safeRedisOp(async () => {
     const redis = getRedis();
@@ -60,10 +60,10 @@ export async function setPermissions(
       cachedAt: new Date().toISOString(),
     };
 
-    await redis.setEx(
+    await redis.setex(
       getKey(`${RBAC_PREFIX}${userId}`),
       ttlSeconds,
-      JSON.stringify(data)
+      JSON.stringify(data),
     );
   });
 }

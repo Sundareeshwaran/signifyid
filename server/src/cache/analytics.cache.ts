@@ -30,7 +30,7 @@ type AnalyticsType = keyof typeof TTL_CONFIG;
  */
 export async function get<T>(
   type: AnalyticsType,
-  orgId: string
+  orgId: string,
 ): Promise<T | null> {
   return safeRedisOp(async () => {
     const redis = getRedis();
@@ -52,7 +52,7 @@ export async function set<T>(
   type: AnalyticsType,
   orgId: string,
   data: T,
-  ttlSeconds?: number
+  ttlSeconds?: number,
 ): Promise<void> {
   await safeRedisOp(async () => {
     const redis = getRedis();
@@ -61,7 +61,7 @@ export async function set<T>(
     const ttl = ttlSeconds ?? TTL_CONFIG[type];
     const key = getKey(`${ANALYTICS_PREFIX}${type}:${orgId}`);
 
-    await redis.setEx(key, ttl, JSON.stringify(data));
+    await redis.setex(key, ttl, JSON.stringify(data));
   });
 }
 
@@ -70,7 +70,7 @@ export async function set<T>(
  */
 export async function invalidate(
   type: AnalyticsType,
-  orgId: string
+  orgId: string,
 ): Promise<void> {
   await safeRedisOp(async () => {
     const redis = getRedis();
@@ -105,7 +105,7 @@ export async function getOrSet<T>(
   type: AnalyticsType,
   orgId: string,
   fetcher: () => Promise<T>,
-  ttlSeconds?: number
+  ttlSeconds?: number,
 ): Promise<T> {
   // Try cache first
   const cached = await get<T>(type, orgId);
