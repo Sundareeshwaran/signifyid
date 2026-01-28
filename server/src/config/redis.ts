@@ -74,6 +74,9 @@ export async function initRedis(): Promise<void> {
         // Connection timeout (10 seconds - increased for cold starts)
         connectTimeout: 10000,
 
+        // Keep-alive to prevent connection drops (10s)
+        keepAlive: 10000,
+
         // Command timeout (10 seconds per command)
         commandTimeout: 10000,
 
@@ -98,6 +101,8 @@ export async function initRedis(): Promise<void> {
           ? {
               tls: {
                 rejectUnauthorized: false,
+                // Skip hostname verification (aggressive fix for connection issues)
+                checkServerIdentity: () => undefined,
               },
             }
           : {}),
@@ -105,23 +110,22 @@ export async function initRedis(): Promise<void> {
         // Enable offline queue for better reliability
         enableOfflineQueue: true,
 
-        // DNS resolution: Try both IPv4 and IPv6
-        family: 0,
+        // FORCE IPv4: Resolves common connection issues in Node/Docker/Vercel
+        family: 4,
       });
 
       // Event handlers - log non-sensitive connection events only
       redis.on("error", (err: Error) => {
         // Log full error details (code, errno) for debugging
         const errorCode = (err as NodeJS.ErrnoException).code || "UNKNOWN";
-        const errorMessage = err.message || "No error message";
+        const message = err.message || "No error message";
         // Sanitize error message to prevent credential leakage
-        const sanitizedMessage = errorMessage
+        const sanitizedMessage = message
           .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
           .replace(/password[=:][^\s]+/gi, "[REDACTED]");
-        logger.error("Redis error", {
-          code: errorCode,
-          message: sanitizedMessage,
-        });
+
+        // Log directly in message string for visibility
+        logger.error(`Redis error: [${errorCode}] ${sanitizedMessage}`);
         isConnected = false;
       });
 
