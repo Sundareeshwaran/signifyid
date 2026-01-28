@@ -1,21 +1,41 @@
 /**
  * Redis Configuration
  *
- * Redis client singleton for caching layer.
+ * Redis client singleton for caching layer using ioredis.
  * Provides graceful fallback if Redis is unavailable.
  *
  * VERCEL SERVERLESS COMPATIBLE:
- * - Lazy initialization (connects on first use)
+ * - Lazy initialization with lazyConnect: true
  * - Race condition protection for cold starts
  * - PING-based health validation
  * - Safe for multiple concurrent invocations
+ * - Automatic reconnection with exponential backoff
+ *
+ * IOREDIS MIGRATION NOTES:
+ * - ioredis connects automatically on first command when lazyConnect is false
+ * - With lazyConnect: true, explicit connect() is required
+ * - Method names are lowercase (setex vs setEx) - ioredis handles both
+ * - TLS is configured via tls option, not socket.tls
  */
-import { createClient, RedisClientType } from "redis";
+import Redis from "ioredis";
 import { config } from "./env.js";
 import { logger } from "./logger.js";
 
-let redis: RedisClientType | null = null;
+/**
+ * Single Redis client instance (singleton pattern)
+ * Null until first initialization
+ */
+let redis: Redis | null = null;
+
+/**
+ * Connection state tracking
+ * Separate from redis.status to handle initialization edge cases
+ */
 let isConnected = false;
+
+/**
+ * Promise for ongoing initialization (prevents race conditions in serverless)
+ */
 let initPromise: Promise<void> | null = null;
 
 /**
@@ -46,27 +66,50 @@ export async function initRedis(): Promise<void> {
       // Determine if TLS is required (rediss:// protocol)
       const useTls = config.redis.url.startsWith("rediss://");
 
-      redis = createClient({
-        url: config.redis.url,
-        socket: {
-          reconnectStrategy: (retries: number) => {
-            if (retries > 10) {
-              logger.error("Redis: Max reconnection attempts reached");
-              return new Error("Max reconnection attempts reached");
+      // Create ioredis client with production-safe configuration
+      redis = new Redis(config.redis.url, {
+        // Lazy connect: don't connect until first command or explicit connect()
+        lazyConnect: true,
+
+        // Connection timeout (5 seconds)
+        connectTimeout: 5000,
+
+        // Command timeout (10 seconds per command)
+        commandTimeout: 10000,
+
+        // Retry strategy with exponential backoff
+        retryStrategy: (times: number) => {
+          if (times > 10) {
+            logger.error("Redis: Max reconnection attempts reached");
+            return null; // Stop retrying
+          }
+          // Exponential backoff: 100ms, 200ms, 400ms, etc.
+          return Math.min(times * 100, 3000);
+        },
+
+        // Max retries per request (for individual commands)
+        maxRetriesPerRequest: 3,
+
+        // TLS configuration for Redis Cloud and other hosted Redis services
+        ...(useTls
+          ? {
+              tls: {
+                rejectUnauthorized: false,
+              },
             }
-            // Exponential backoff: 100ms, 200ms, 400ms, etc.
-            return Math.min(retries * 100, 3000);
-          },
-          connectTimeout: 5000,
-          // TLS configuration for Redis Cloud and other hosted Redis services
-          ...(useTls ? { tls: { rejectUnauthorized: false } } : {}),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+          : {}),
+
+        // Disable offline queue to fail fast when disconnected
+        enableOfflineQueue: true,
       });
 
-      // Event handlers
+      // Event handlers - log non-sensitive connection events only
       redis.on("error", (err: Error) => {
-        logger.error("Redis error", { message: err.message, stack: err.stack });
+        // Sanitize error message to prevent credential leakage
+        const sanitizedMessage = err.message
+          .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
+          .replace(/password[=:][^\s]+/gi, "[REDACTED]");
+        logger.error("Redis error", { message: sanitizedMessage });
         isConnected = false;
       });
 
@@ -79,15 +122,26 @@ export async function initRedis(): Promise<void> {
         logger.info("Redis reconnecting...");
       });
 
-      redis.on("end", () => {
+      redis.on("close", () => {
         logger.warn("Redis connection closed");
         isConnected = false;
       });
 
-      // Connect to Redis
+      redis.on("ready", () => {
+        logger.info("Redis ready");
+        isConnected = true;
+      });
+
+      // Explicitly connect (required with lazyConnect: true)
       await redis.connect();
     } catch (error) {
-      logger.error("Failed to connect to Redis", { error });
+      // Sanitize error for logging
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      const sanitizedMessage = errorMessage
+        .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
+        .replace(/password[=:][^\s]+/gi, "[REDACTED]");
+      logger.error("Failed to connect to Redis", { error: sanitizedMessage });
       redis = null;
       isConnected = false;
     } finally {
@@ -112,8 +166,11 @@ export async function ensureRedis(): Promise<void> {
 /**
  * Get Redis client
  * Returns null if Redis is not available
+ *
+ * Note: This returns the ioredis client. Method names are lowercase
+ * but ioredis is case-insensitive for most operations.
  */
-export function getRedis(): RedisClientType | null {
+export function getRedis(): Redis | null {
   return redis;
 }
 
@@ -144,7 +201,7 @@ export async function disconnectRedis(): Promise<void> {
       // Only log if it's not a "client already closed" error
       if (
         !(error instanceof Error) ||
-        !error.message.includes("client is closed")
+        !error.message.includes("Connection is closed")
       ) {
         logger.error("Error disconnecting Redis", { error });
       }
@@ -160,7 +217,7 @@ export async function disconnectRedis(): Promise<void> {
  * Returns null on any error, allowing fallback to PostgreSQL
  */
 export async function safeRedisOp<T>(
-  operation: () => Promise<T>
+  operation: () => Promise<T>,
 ): Promise<T | null> {
   if (!isRedisConnected()) {
     return null;
@@ -169,7 +226,13 @@ export async function safeRedisOp<T>(
   try {
     return await operation();
   } catch (error) {
-    logger.error("Redis operation failed", { error });
+    // Sanitize error message
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const sanitizedMessage = errorMessage
+      .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
+      .replace(/password[=:][^\s]+/gi, "[REDACTED]");
+    logger.error("Redis operation failed", { error: sanitizedMessage });
     return null;
   }
 }

@@ -43,7 +43,7 @@ export async function get(sessionId: string): Promise<SessionRow | null> {
  */
 export async function set(
   sessionId: string,
-  session: SessionRow
+  session: SessionRow,
 ): Promise<void> {
   await safeRedisOp(async () => {
     const redis = getRedis();
@@ -54,10 +54,10 @@ export async function set(
     const ttlMs = expiresAt.getTime() - Date.now();
     const ttlSeconds = Math.max(Math.floor(ttlMs / 1000), 1);
 
-    await redis.setEx(
+    await redis.setex(
       getKey(`${SESSION_PREFIX}${sessionId}`),
       ttlSeconds,
-      JSON.stringify(session)
+      JSON.stringify(session),
     );
   });
 }

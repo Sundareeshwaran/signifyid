@@ -50,7 +50,7 @@ setInterval(cleanupMemory, 60_000);
 export async function store(
   key: string,
   challenge: string,
-  ttlSeconds: number = DEFAULT_TTL_SECONDS
+  ttlSeconds: number = DEFAULT_TTL_SECONDS,
 ): Promise<void> {
   const fullKey = `${CHALLENGE_PREFIX}${key}`;
 
@@ -58,7 +58,7 @@ export async function store(
     const redis = getRedis();
     if (!redis) return false;
 
-    await redis.setEx(getKey(fullKey), ttlSeconds, challenge);
+    await redis.setex(getKey(fullKey), ttlSeconds, challenge);
     return true;
   });
 

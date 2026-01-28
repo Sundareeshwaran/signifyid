@@ -23,7 +23,7 @@ export async function get(sessionId: string): Promise<ClientSession | null> {
     if (!redis) return null;
 
     const data = await redis.get(
-      getKey(`${CLIENT_SESSION_PREFIX}${sessionId}`)
+      getKey(`${CLIENT_SESSION_PREFIX}${sessionId}`),
     );
     if (!data) return null;
 
@@ -51,7 +51,7 @@ export async function get(sessionId: string): Promise<ClientSession | null> {
  */
 export async function set(
   sessionId: string,
-  session: ClientSession
+  session: ClientSession,
 ): Promise<void> {
   await safeRedisOp(async () => {
     const redis = getRedis();
@@ -62,10 +62,10 @@ export async function set(
     const ttlMs = expiresAt.getTime() - Date.now();
     const ttlSeconds = Math.max(Math.floor(ttlMs / 1000), 1);
 
-    await redis.setEx(
+    await redis.setex(
       getKey(`${CLIENT_SESSION_PREFIX}${sessionId}`),
       ttlSeconds,
-      JSON.stringify(session)
+      JSON.stringify(session),
     );
   });
 }

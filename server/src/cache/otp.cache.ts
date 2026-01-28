@@ -26,7 +26,7 @@ interface StoredOTP {
 export async function store(
   identifier: string, // user_id or email
   code: string,
-  ttlSeconds: number = DEFAULT_TTL_SECONDS
+  ttlSeconds: number = DEFAULT_TTL_SECONDS,
 ): Promise<boolean> {
   const result = await safeRedisOp(async () => {
     const redis = getRedis();
@@ -38,10 +38,10 @@ export async function store(
       createdAt: new Date().toISOString(),
     };
 
-    await redis.setEx(
+    await redis.setex(
       getKey(`${OTP_PREFIX}${identifier}`),
       ttlSeconds,
-      JSON.stringify(data)
+      JSON.stringify(data),
     );
 
     return true;
@@ -58,7 +58,7 @@ export async function store(
 export async function verify(
   identifier: string,
   code: string,
-  maxAttempts: number = 5
+  maxAttempts: number = 5,
 ): Promise<{ valid: boolean; error?: string }> {
   const result = await safeRedisOp(async () => {
     const redis = getRedis();
@@ -83,7 +83,7 @@ export async function verify(
     stored.attempts++;
     const ttl = await redis.ttl(key);
     if (ttl > 0) {
-      await redis.setEx(key, ttl, JSON.stringify(stored));
+      await redis.setex(key, ttl, JSON.stringify(stored));
     }
 
     // Verify code
