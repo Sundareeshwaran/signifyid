@@ -5,18 +5,30 @@
  */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import app from "../src/app.js";
+import { getAllowedOrigins } from "../src/services/cors.service.js";
 
 // Handle Vercel requests with explicit CORS for preflight
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Get the requesting origin
   const requestOrigin = req.headers.origin || "";
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
-  // Define allowed origins - production URL and localhost for development
-  const isAllowedOrigin =
-    requestOrigin === frontendUrl ||
-    requestOrigin.startsWith("http://localhost:") ||
-    requestOrigin.startsWith("http://127.0.0.1:");
+  // Get allowed origins from database (cached)
+  let isAllowedOrigin = false;
+
+  try {
+    const allowedOrigins = await getAllowedOrigins();
+    isAllowedOrigin =
+      allowedOrigins.includes(requestOrigin) ||
+      requestOrigin.startsWith("http://localhost:") ||
+      requestOrigin.startsWith("http://127.0.0.1:");
+  } catch {
+    // Fallback: allow frontend URL and localhost on database error
+    isAllowedOrigin =
+      requestOrigin === frontendUrl ||
+      requestOrigin.startsWith("http://localhost:") ||
+      requestOrigin.startsWith("http://127.0.0.1:");
+  }
 
   // Set CORS headers - use requesting origin if allowed, otherwise use frontend URL
   const allowedOrigin = isAllowedOrigin ? requestOrigin : frontendUrl;

@@ -71,25 +71,39 @@ app.use(
   }),
 );
 
-// CORS configuration using FRONTEND_URL env variable
-const allowedOrigins = [config.frontendUrl];
+// CORS configuration using database-driven origins from client redirect URIs
+import { getAllowedOrigins } from "./services/cors.service.js";
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: async (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) {
         return callback(null, true);
       }
-      // Check if origin is in allowed list or localhost (for SDK development)
-      // Allow localhost in all environments so SDK developers can test against production
+
+      // Always allow localhost for SDK development
       if (
-        allowedOrigins.includes(origin) ||
         origin.startsWith("http://localhost:") ||
         origin.startsWith("http://127.0.0.1:")
       ) {
         return callback(null, origin);
       }
+
+      try {
+        // Get allowed origins from database (cached)
+        const allowedOrigins = await getAllowedOrigins();
+
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, origin);
+        }
+      } catch {
+        // On database error, only allow frontend URL
+        if (origin === config.frontendUrl) {
+          return callback(null, origin);
+        }
+      }
+
       // Origin not allowed
       console.error(`CORS blocked request from origin: ${origin}`);
       return callback(new Error("Not allowed by CORS"));
