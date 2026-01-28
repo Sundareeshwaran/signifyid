@@ -54,7 +54,7 @@ export async function set(
     const ttlMs = expiresAt.getTime() - Date.now();
     const ttlSeconds = Math.max(Math.floor(ttlMs / 1000), 1);
 
-    await redis.setex(
+    await redis.setEx(
       getKey(`${SESSION_PREFIX}${sessionId}`),
       ttlSeconds,
       JSON.stringify(session),

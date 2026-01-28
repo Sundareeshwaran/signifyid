@@ -1,23 +1,23 @@
 /**
  * Redis Configuration
  *
- * Redis client singleton for caching layer using ioredis.
+ * Redis client singleton for caching layer using node-redis.
  * Provides graceful fallback if Redis is unavailable.
  *
  * VERCEL SERVERLESS COMPATIBLE:
- * - Lazy initialization with lazyConnect: true
+ * - Lazy initialization
  * - Race condition protection for cold starts
  * - PING-based health validation
  * - Safe for multiple concurrent invocations
  * - Automatic reconnection with exponential backoff
  *
- * IOREDIS MIGRATION NOTES:
- * - ioredis connects automatically on first command when lazyConnect is false
- * - With lazyConnect: true, explicit connect() is required
- * - Method names are lowercase (setex vs setEx) - ioredis handles both
- * - TLS is configured via tls option, not socket.tls
+ * NODE-REDIS NOTES:
+ * - Uses createClient() factory function
+ * - Method names are camelCase (setEx, not setex)
+ * - TLS is configured via socket.tls option
+ * - Events: error, connect, ready, end
  */
-import Redis from "ioredis";
+import { createClient, RedisClientType } from "redis";
 import { config } from "./env.js";
 import { logger } from "./logger.js";
 
@@ -25,11 +25,11 @@ import { logger } from "./logger.js";
  * Single Redis client instance (singleton pattern)
  * Null until first initialization
  */
-let redis: Redis | null = null;
+let redis: RedisClientType | null = null;
 
 /**
  * Connection state tracking
- * Separate from redis.status to handle initialization edge cases
+ * Separate from redis.isReady to handle initialization edge cases
  */
 let isConnected = false;
 
@@ -66,53 +66,39 @@ export async function initRedis(): Promise<void> {
       // Determine if TLS is required (rediss:// protocol)
       const useTls = config.redis.url.startsWith("rediss://");
 
-      // Create ioredis client with production-safe configuration
+      // Create node-redis client with production-safe configuration
       // Optimized for Vercel KV (Upstash) and serverless environments
-      redis = new Redis(config.redis.url, {
-        // Lazy connect: don't connect until first command or explicit connect()
-        lazyConnect: true,
+      redis = createClient({
+        url: config.redis.url,
 
-        // Connection timeout (10 seconds - increased for cold starts)
-        connectTimeout: 10000,
+        // Socket configuration
+        socket: {
+          // Connection timeout (10 seconds - increased for cold starts)
+          connectTimeout: 10000,
 
-        // Keep-alive to prevent connection drops (10s)
-        keepAlive: 10000,
+          // Keep-alive to prevent connection drops
+          keepAlive: 10000,
 
-        // Command timeout (10 seconds per command)
-        commandTimeout: 10000,
-
-        // Retry strategy with exponential backoff
-        retryStrategy: (times: number) => {
-          if (times > 10) {
-            logger.error("Redis: Max reconnection attempts reached");
-            return null; // Stop retrying
-          }
-          // Exponential backoff: 100ms, 200ms, 400ms, etc.
-          const delay = Math.min(times * 100, 3000);
-          logger.info(`Redis: Retry attempt ${times}, waiting ${delay}ms`);
-          return delay;
-        },
-
-        // Max retries per request (for individual commands)
-        maxRetriesPerRequest: 3,
-
-        // TLS configuration for Vercel KV (Upstash)
-        // Vercel KV uses valid certificates, so we use standard TLS settings
-        ...(useTls
-          ? {
-              tls: {
-                // In some Vercel environments, CA certs might be missing,
-                // so we allow unauthorized as a safe fallback for connectivity
-                rejectUnauthorized: false,
-              },
+          // Reconnect strategy with exponential backoff
+          reconnectStrategy: (retries: number) => {
+            if (retries > 10) {
+              logger.error("Redis: Max reconnection attempts reached");
+              return new Error("Max retries reached");
             }
-          : {}),
+            // Exponential backoff: 100ms, 200ms, 400ms, etc.
+            const delay = Math.min(retries * 100, 3000);
+            logger.info(`Redis: Retry attempt ${retries}, waiting ${delay}ms`);
+            return delay;
+          },
 
-        // Enable offline queue for better reliability
-        enableOfflineQueue: true,
-
-        // FORCE IPv4: Resolves common connection issues in Node/Docker/Vercel
-        family: 4,
+          // TLS configuration for Vercel KV (Upstash)
+          ...(useTls
+            ? {
+                tls: true,
+                rejectUnauthorized: false,
+              }
+            : {}),
+        },
       });
 
       // Event handlers - log non-sensitive connection events only
@@ -139,7 +125,7 @@ export async function initRedis(): Promise<void> {
         logger.info("Redis reconnecting...");
       });
 
-      redis.on("close", () => {
+      redis.on("end", () => {
         logger.warn("Redis connection closed");
         isConnected = false;
       });
@@ -149,7 +135,7 @@ export async function initRedis(): Promise<void> {
         isConnected = true;
       });
 
-      // Explicitly connect (required with lazyConnect: true)
+      // Connect to Redis
       await redis.connect();
     } catch (error) {
       // Sanitize error for logging but include error code for debugging
@@ -188,10 +174,9 @@ export async function ensureRedis(): Promise<void> {
  * Get Redis client
  * Returns null if Redis is not available
  *
- * Note: This returns the ioredis client. Method names are lowercase
- * but ioredis is case-insensitive for most operations.
+ * Note: This returns the node-redis client. Method names are camelCase.
  */
-export function getRedis(): Redis | null {
+export function getRedis(): RedisClientType | null {
   return redis;
 }
 
@@ -216,7 +201,7 @@ export function getKey(key: string): string {
 export async function disconnectRedis(): Promise<void> {
   if (redis && isConnected) {
     try {
-      await redis.quit();
+      await redis.disconnect();
       logger.info("Redis disconnected gracefully");
     } catch (error) {
       // Only log if it's not a "client already closed" error
