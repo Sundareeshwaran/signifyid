@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -87,7 +87,11 @@ function LoginContent() {
   const [passkeyEmail, setPasskeyEmail] = useState("");
   const [passkeyError, setPasskeyError] = useState("");
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
-  const [webAuthnSupported] = useState(() => isWebAuthnSupported());
+  const [webAuthnSupported, setWebAuthnSupported] = useState(false);
+
+  useEffect(() => {
+    setWebAuthnSupported(isWebAuthnSupported());
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -188,7 +192,7 @@ function LoginContent() {
       const { hasPasskeys } = await checkPasskeys(passkeyEmail);
       if (!hasPasskeys) {
         setPasskeyError(
-          "No passkeys found for this email. Please sign in with password first and register a passkey."
+          "No passkeys found for this email. Please sign in with password first and register a passkey.",
         );
         setIsPasskeyLoading(false);
         return;
@@ -238,7 +242,7 @@ function LoginContent() {
 
       if (!response.ok) {
         setSsoError(
-          data.message || data.error || "SSO is not available for this domain"
+          data.message || data.error || "SSO is not available for this domain",
         );
         setIsSsoLoading(false);
         return;
