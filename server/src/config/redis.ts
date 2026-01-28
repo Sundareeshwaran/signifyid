@@ -71,8 +71,8 @@ export async function initRedis(): Promise<void> {
         // Lazy connect: don't connect until first command or explicit connect()
         lazyConnect: true,
 
-        // Connection timeout (5 seconds)
-        connectTimeout: 5000,
+        // Connection timeout (10 seconds - increased for cold starts)
+        connectTimeout: 10000,
 
         // Command timeout (10 seconds per command)
         commandTimeout: 10000,
@@ -84,13 +84,16 @@ export async function initRedis(): Promise<void> {
             return null; // Stop retrying
           }
           // Exponential backoff: 100ms, 200ms, 400ms, etc.
-          return Math.min(times * 100, 3000);
+          const delay = Math.min(times * 100, 3000);
+          logger.info(`Redis: Retry attempt ${times}, waiting ${delay}ms`);
+          return delay;
         },
 
         // Max retries per request (for individual commands)
         maxRetriesPerRequest: 3,
 
         // TLS configuration for Redis Cloud and other hosted Redis services
+        // ioredis requires tls option to be set explicitly for rediss:// URLs
         ...(useTls
           ? {
               tls: {
@@ -99,17 +102,26 @@ export async function initRedis(): Promise<void> {
             }
           : {}),
 
-        // Disable offline queue to fail fast when disconnected
+        // Enable offline queue for better reliability
         enableOfflineQueue: true,
+
+        // DNS resolution: Try both IPv4 and IPv6
+        family: 0,
       });
 
       // Event handlers - log non-sensitive connection events only
       redis.on("error", (err: Error) => {
+        // Log full error details (code, errno) for debugging
+        const errorCode = (err as NodeJS.ErrnoException).code || "UNKNOWN";
+        const errorMessage = err.message || "No error message";
         // Sanitize error message to prevent credential leakage
-        const sanitizedMessage = err.message
+        const sanitizedMessage = errorMessage
           .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
           .replace(/password[=:][^\s]+/gi, "[REDACTED]");
-        logger.error("Redis error", { message: sanitizedMessage });
+        logger.error("Redis error", {
+          code: errorCode,
+          message: sanitizedMessage,
+        });
         isConnected = false;
       });
 
@@ -135,13 +147,17 @@ export async function initRedis(): Promise<void> {
       // Explicitly connect (required with lazyConnect: true)
       await redis.connect();
     } catch (error) {
-      // Sanitize error for logging
+      // Sanitize error for logging but include error code for debugging
+      const errorCode = (error as NodeJS.ErrnoException).code || "UNKNOWN";
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       const sanitizedMessage = errorMessage
         .replace(/redis[s]?:\/\/[^\s]+/gi, "[REDACTED]")
         .replace(/password[=:][^\s]+/gi, "[REDACTED]");
-      logger.error("Failed to connect to Redis", { error: sanitizedMessage });
+      logger.error("Failed to connect to Redis", {
+        code: errorCode,
+        error: sanitizedMessage,
+      });
       redis = null;
       isConnected = false;
     } finally {
