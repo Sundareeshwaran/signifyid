@@ -37,8 +37,10 @@ function ClientCallbackContent() {
         const token = searchParams.get("token");
 
         // Validate session with backend
-        const apiUrl =
+        const rawApiUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        // Normalize API URL - remove trailing slashes to prevent double-slash issues
+        const apiUrl = rawApiUrl.replace(/\/+$/, "");
 
         const response = await fetch(`${apiUrl}/client-auth/session/validate`, {
           method: "GET",

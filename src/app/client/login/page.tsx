@@ -52,8 +52,10 @@ function ClientLoginContent() {
     setLoading(true);
 
     try {
-      const apiUrl =
+      const rawApiUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      // Normalize API URL - remove trailing slashes to prevent double-slash issues
+      const apiUrl = rawApiUrl.replace(/\/+$/, "");
 
       // Send the redirect_uri from query params to backend
       // Backend will validate against registered URIs and return final redirect
