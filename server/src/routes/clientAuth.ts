@@ -12,13 +12,12 @@ const router: IRouter = Router();
 
 // Redis-backed rate limiters for client auth
 const clientLoginRateLimiter = createRedisRateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 5 * 60 * 1000, // 5 minutes
   max: 3,
   keyPrefix: "client:login",
   message: {
     error: "too_many_requests",
-    error_description:
-      "Too many login attempts. Please try again in 15 minutes.",
+    error_description: "Too many login attempts. Please try again in 1 minute.",
   },
 });
 
@@ -50,7 +49,7 @@ router.post("/login", clientLoginRateLimiter, clientAuthController.login);
 router.post(
   "/session/validate",
   clientSessionValidateRateLimiter,
-  clientAuthController.validateSession
+  clientAuthController.validateSession,
 );
 
 /**
@@ -60,7 +59,7 @@ router.post(
 router.get(
   "/session/validate",
   clientSessionValidateRateLimiter,
-  clientAuthController.validateSession
+  clientAuthController.validateSession,
 );
 
 /**

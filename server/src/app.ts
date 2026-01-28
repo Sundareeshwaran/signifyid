@@ -68,7 +68,7 @@ app.use(
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
     noSniff: true,
     xssFilter: true,
-  })
+  }),
 );
 
 // CORS configuration using FRONTEND_URL env variable
@@ -82,21 +82,27 @@ app.use(
         return callback(null, true);
       }
       // Check if origin is in allowed list
-      if (allowedOrigins.includes(origin)) {
+      // Check if origin is in allowed list or if it's a localhost in development
+      if (
+        allowedOrigins.includes(origin) ||
+        (config.nodeEnv === "development" &&
+          origin.startsWith("http://localhost"))
+      ) {
         return callback(null, origin);
       }
       // Origin not allowed
+      console.error(`CORS blocked request from origin: ${origin}`);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 5 * 60 * 1000, // 5 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
@@ -170,7 +176,7 @@ app.use("/api/support", supportRouter);
 // OIDC Discovery endpoints (outside /api prefix)
 app.get(
   "/.well-known/openid-configuration",
-  oauthController.openidConfiguration
+  oauthController.openidConfiguration,
 );
 
 // 404 handler
