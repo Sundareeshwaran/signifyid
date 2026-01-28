@@ -177,8 +177,6 @@ server/prisma/migrations/**/migration_lock.toml
 # Docker
 *.dockerfile.dev
 
-#Server
-server/
 
 # ==============================================================================
 # MISCELLANEOUS
