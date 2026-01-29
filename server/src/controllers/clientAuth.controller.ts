@@ -47,7 +47,7 @@ export async function login(req: Request, res: Response) {
     const validation = await ClientModel.validateClientForSiteAuth(
       client_id,
       client_secret,
-      domain
+      domain,
     );
 
     if (!validation.valid) {
@@ -63,7 +63,7 @@ export async function login(req: Request, res: Response) {
             domain,
             ip: ipAddress,
             user_agent: userAgent,
-          }
+          },
         );
       }
 
@@ -115,7 +115,7 @@ export async function login(req: Request, res: Response) {
             } catch {
               return redirect_uri === registeredUri;
             }
-          }
+          },
         );
 
         if (isValidRedirect) {
@@ -154,7 +154,7 @@ export async function login(req: Request, res: Response) {
       ipAddress,
       userAgent,
       null,
-      24
+      24,
     );
 
     // Audit log - login success
@@ -188,7 +188,7 @@ export async function login(req: Request, res: Response) {
           redirect_uri: finalRedirectUri,
           ip: ipAddress,
           timestamp: new Date().toISOString(),
-        }
+        },
       );
     }
 
@@ -196,7 +196,7 @@ export async function login(req: Request, res: Response) {
     res.cookie("clientSession", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -250,7 +250,7 @@ export async function validateSession(req: Request, res: Response) {
 
     // Get client info
     const client = await ClientModel.findByClientId(
-      (await ClientSessionModel.findById(session.id))?.client_id || ""
+      (await ClientSessionModel.findById(session.id))?.client_id || "",
     );
 
     // Verify domain matches (security check)
@@ -278,7 +278,7 @@ export async function validateSession(req: Request, res: Response) {
       !normalizedRequestDomain.endsWith(normalizedSessionDomain)
     ) {
       console.warn(
-        `[ClientAuth] Domain mismatch: session=${normalizedSessionDomain}, request=${normalizedRequestDomain}`
+        `[ClientAuth] Domain mismatch: session=${normalizedSessionDomain}, request=${normalizedRequestDomain}`,
       );
       res.status(403).json({
         valid: false,
@@ -335,7 +335,7 @@ export async function logout(req: Request, res: Response) {
     // Audit log - logout
     if (session) {
       const client = await ClientModel.findByClientId(
-        (await ClientSessionModel.findById(session.id))?.client_id || ""
+        (await ClientSessionModel.findById(session.id))?.client_id || "",
       );
       if (client) {
         await AuditLogModel.create(client.org_id, null, "client_logout", {
@@ -347,7 +347,12 @@ export async function logout(req: Request, res: Response) {
     }
 
     // Clear cookie
-    res.clearCookie("clientSession");
+    res.clearCookie("clientSession", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
 
     res.json({ success: true });
   } catch (error) {
@@ -381,7 +386,7 @@ export async function callback(req: Request, res: Response) {
 
     // Get client info
     const client = await ClientModel.findByClientId(
-      (await ClientSessionModel.findById(session.id))?.client_id || ""
+      (await ClientSessionModel.findById(session.id))?.client_id || "",
     );
 
     if (!client) {
