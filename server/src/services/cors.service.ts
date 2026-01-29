@@ -22,7 +22,7 @@ async function loadAllowedOrigins(): Promise<string[]> {
       `SELECT DISTINCT unnest(redirect_uris) as origin 
        FROM clients 
        WHERE (is_active = TRUE OR is_active IS NULL)
-       AND status = 'active'`
+       AND status = 'active'`,
     );
 
     // Extract unique origins from redirect URIs
@@ -69,7 +69,7 @@ export async function getAllowedOrigins(): Promise<string[]> {
   lastCacheUpdate = now;
 
   logger.info(
-    `Loaded ${allowedOriginsCache.length} CORS origins from database`
+    `Loaded ${allowedOriginsCache.length} CORS origins from database`,
   );
   return allowedOriginsCache;
 }
@@ -89,7 +89,7 @@ export function invalidateCorsCache(): void {
  */
 export async function corsOriginChecker(
   origin: string | undefined,
-  callback: (err: Error | null, allow?: boolean) => void
+  callback: (err: Error | null, allow?: boolean) => void,
 ): Promise<void> {
   // Allow requests with no origin (like mobile apps or curl)
   if (!origin) {
