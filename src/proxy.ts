@@ -13,6 +13,8 @@ import type { NextRequest } from "next/server";
 const PUBLIC_PATHS = [
   "/client/login",
   "/client/callback",
+  "/client/protected",
+  "/client/success",
   "/login",
   "/register",
   "/invite",
